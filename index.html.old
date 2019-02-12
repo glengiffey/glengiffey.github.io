@@ -1,0 +1,311 @@
+
+<!DOCTYPE html>
+
+<html>
+
+<head>
+<title>hwshen WebGL &mdash; code07 </title>
+<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+
+<script type="text/javascript" src="glMatrix-0.9.5.min.js"></script>
+
+<!--  ************** Fragment Shader ************* --> 
+<script id="shader-fs" type="x-shader/x-fragment">
+   precision mediump float;
+   precision mediump int;
+
+   uniform mat4 uMMatrix;    // model matrix
+   uniform mat4 uVMatrix;    // view matrix 
+   uniform mat4 uPMatrix;    // projection matrix 
+   uniform mat4 uNMatrix;    // normal matrix 
+   uniform mat4 uV2WMatrix;  // eye to world 
+
+   uniform vec4 light_pos; 
+   uniform vec4 ambient_coef;
+   uniform vec4 diffuse_coef;
+   uniform vec4 specular_coef;
+   uniform float mat_shininess; 
+
+   uniform vec4 light_ambient; 
+   uniform vec4 light_diffuse; 
+   uniform vec4 light_specular;
+
+   uniform int use_texture; 
+   uniform sampler2D myTexture;
+   uniform samplerCube cubeMap; 
+   uniform samplerCube skyCubeMap;
+
+   varying vec4 eye_pos; 
+   varying vec3 v_normal;
+   varying highp vec2 FtexCoord;
+   varying vec4 vColor; 
+
+   void main(void) {
+
+     vec3 view_vector, ref; 
+     vec4 env_color = vec4(1,0,0,1);
+
+          view_vector = normalize(vec3(vec4(0,0,0,1)-eye_pos));
+          ref = normalize(reflect(-view_vector, v_normal));  // in eye space
+          ref = vec3(uV2WMatrix*vec4(ref,0));   // convert to world space
+          env_color = textureCube(cubeMap, ref);
+          gl_FragColor = env_color;
+
+}
+</script>
+<!--  ************** Fragment Shader ************* --> 
+<script id="phong-shader-fs" type="x-shader/x-fragment">
+precision mediump float;
+
+  uniform mat4 uMMatrix; 
+  uniform mat4 uVMatrix;
+  uniform mat4 uPMatrix;
+  uniform mat4 uNMatrix; 
+
+  uniform vec4 light_pos; 
+
+  uniform vec4 ambient_coef;
+  uniform vec4 diffuse_coef;
+  uniform vec4 specular_coef;
+  uniform float mat_shininess;
+  
+  uniform vec4 mat_ambient;
+  uniform vec4 mat_diffuse;
+  uniform vec4 mat_specular; 
+
+  uniform vec4 light_ambient; 
+  uniform vec4 light_diffuse; 
+  uniform vec4 light_specular;
+
+  varying vec4 eye_pos; 
+  varying vec3 v_normal;
+  varying vec4 vColor; 
+
+void main(void) {
+  // transform light pos from local to eye space
+  //vec4 light_pos_in_eye = uVMatrix * uMMatrix * light_pos;
+  vec4 light_pos_in_eye = uVMatrix * light_pos;
+
+  // light vector L = l-p 
+  vec3 light_vector = normalize(vec3(light_pos_in_eye - eye_pos)); 
+
+  // eye vector V = e-p, where e is (0,0,0) 
+  vec3 eye_vector = normalize(-vec3(eye_pos));
+
+  // halfway vector (L+V) 
+  vec3 halfv = normalize(light_vector+eye_vector); 
+
+  //vec4 ambient = ambient_coef * light_ambient * mat_ambient; 
+  vec4 ambient = ambient_coef * light_ambient;
+  float ndotl = max(dot(v_normal, light_vector), 0.0); 
+
+  //vec4 diffuse = diffuse_coef * light_diffuse*mat_diffuse* ndotl;
+  vec4 diffuse = diffuse_coef * light_diffuse * ndotl;
+
+  //both lines below are okay. One is to use the reflect function the other is to compute by yourself 
+  vec3 R= normalize(vec3(reflect(-light_vector, v_normal))); 
+  //vec3 R = normalize(2.0 * ndotl *v_normal-eye_vector);
+  
+  float rdotv = max(dot(R, eye_vector), 0.0);
+
+  vec4 specular;  
+  if (ndotl>0.0) {
+    //specular = specular_coef* light_specular*mat_specular*pow(rdotv, mat_shininess);
+    specular = specular_coef* light_specular*pow(rdotv, mat_shininess);
+  } 
+  else
+  specular = vec4(0,0,0,1);  
+
+  //vColor = ambient+diffuse+specular;
+  //      vColor = vec4(eye_vector, 1.0); 
+  //      vColor = aVertexColor;
+  //      vColor = vec4(aVertexNormal, 1.0);
+  //      vColor = vec4(v_normal, 1.0);
+
+  gl_FragColor = ambient+diffuse+specular;
+}
+</script>
+<!--  ************** Fragment Shader ************* --> 
+<script id="texture-shader-fs" type="x-shader/x-fragment">
+   precision mediump float;
+   precision mediump int;
+
+   uniform mat4 uMMatrix;    // model matrix
+   uniform mat4 uVMatrix;    // view matrix 
+   uniform mat4 uPMatrix;    // projection matrix 
+   uniform mat4 uNMatrix;    // normal matrix 
+   uniform mat4 uV2WMatrix;  // eye to world 
+
+   uniform sampler2D myTexture;
+
+   varying highp vec2 FtexCoord; 
+   varying vec4 vColor; 
+
+   void main(void) {
+      vec4 texcolor;
+      texcolor = texture2D(myTexture, FtexCoord); 
+      gl_FragColor = texcolor; 
+}
+</script>
+
+<!--  ************** Vertex Shader ************* --> 
+<script id="shader-vs" type="x-shader/x-vertex">
+  precision mediump float;
+  precision mediump int; 
+
+  attribute vec3 aVertexPosition;
+  attribute vec3 aVertexNormal;
+  attribute vec2 aVertexTexCoords; 
+  attribute vec3 aVertexColor;
+
+  uniform mat4 uMMatrix; 
+  uniform mat4 uVMatrix;
+  uniform mat4 uPMatrix;
+  uniform mat4 uNMatrix;
+  uniform mat4 uV2WMatrix;  // eye to world 
+
+  uniform vec4 light_pos; 
+  uniform vec4 ambient_coef;
+  uniform vec4 diffuse_coef;
+  uniform vec4 specular_coef;
+  uniform float mat_shininess; 
+
+  uniform vec4 mat_ambient;
+  uniform vec4 mat_diffuse;
+  uniform vec4 mat_specular; 
+
+  uniform vec4 light_ambient; 
+  uniform vec4 light_diffuse; 
+  uniform vec4 light_specular;
+
+  uniform int use_texture; 
+  uniform sampler2D myTexture; 
+
+  varying vec4 eye_pos;  //vertex position in eye space 
+  varying vec3 v_normal;  // vertex normal
+  varying highp vec2 FtexCoord; 
+  varying vec4 vColor; 
+
+
+  void main(void) {
+    // transform normal from local to eye space: normal matrix is the inverse transpose of the modelview matrix 
+    v_normal = normalize(vec3(uNMatrix*vec4(aVertexNormal, 1.0)));
+    // transform the vertex position to eye space 
+    eye_pos = uVMatrix*uMMatrix*vec4(aVertexPosition, 1.0);
+
+    FtexCoord = aVertexTexCoords;
+    vColor = normalize(vec4(aVertexColor, 1.0));
+
+    gl_Position = uPMatrix*uVMatrix*uMMatrix*vec4(aVertexPosition, 1.0);
+    gl_PointSize = 10.0;
+}
+</script>
+
+
+<script type="text/javascript" src="shaders_setup.js"></script>
+<script type="text/javascript" src="code07.js"></script>
+
+
+</head>
+
+
+<body onload="webGLStart();">
+    <canvas id="code03-canvas"style="border:none;"width="700"height="700"></canvas>
+    
+    <div>
+    <h4>
+    Click on the left mouse button and move the coursor to rotate
+    </h4>
+    </div>
+
+    <h4> Texture:  </h4>
+    <button  onclick="texture(0)"> NO  </button>
+    <button  onclick="texture(1)"> Regular </button>
+    <button  onclick="texture(2)"> Cubemap </button>
+
+    <h4> Selection (Select which object to control):
+    <button onclick="Control(1)"> Environment </button>
+    <button onclick="Control(2)"> Object </button>
+    <button onclick="Control(3)"> Arms </button>
+    <button onclick="Control(4)"> Roll Camera </button>
+    <button onclick="Control(0)"> Sliders </button>
+
+    <h4> Camera: 
+    <button onclick="CameraPosition(1)"> Up </button>
+    <button onclick="CameraPosition(2)"> Down </button>
+    <button onclick="CameraPosition(3)"> Left </button>
+    <button onclick="CameraPosition(4)"> Right </button>
+    <button onclick="CameraPosition(5)"> Forward </button>
+    <button onclick="CameraPosition(6)"> Backward </button>
+    </h4>
+    <h4> Ambient Intensity (R)
+    <input type="range" min="0" max="100" value="0" step="5" onchange="AmbientIntensity(this.value, -1, -1)" />
+     Ambient Intensity (G)
+    <input type="range" min="0" max="100" value="0" step="5" onchange="AmbientIntensity(-1, this.value, -1)" />
+     Ambient Intensity (B)
+    <input type="range" min="0" max="100" value="0" step="5" onchange="AmbientIntensity(-1, -1, this.value)" />
+    </h4>
+    <h4> Diffuse Intensity (R)
+    <input type="range" min="0" max="100" value="80" step="5" onchange="DiffuseIntensity(this.value, -1, -1)" />
+     Diffuse Intensity (G)
+    <input type="range" min="0" max="100" value="80" step="5" onchange="DiffuseIntensity(-1, this.value, -1)" />
+     Diffuse Intensity (B)
+    <input type="range" min="0" max="100" value="80" step="5" onchange="DiffuseIntensity(-1, -1, this.value)" />
+    </h4>
+    <h4> Specular Intensity (R)
+    <input type="range" min="0" max="100" value="100" step="5" onchange="SpecularIntensity(this.value, -1, -1)" />
+     Specular Intensity (G)
+    <input type="range" min="0" max="100" value="100" step="5" onchange="SpecularIntensity( -1, this.value, -1)" />
+     Specular Intensity (B)
+    <input type="range" min="0" max="100" value="100" step="5" onchange="SpecularIntensity( -1, -1, this.value)" />
+    </h4>
+    
+    <h4> Light: 
+    <button onclick="LightPosition(1)"> Up </button>
+    <button onclick="LightPosition(2)"> Down </button>
+    <button onclick="LightPosition(3)"> Left </button>
+    <button onclick="LightPosition(4)"> Right </button>
+    <button onclick="LightPosition(5)"> Forward </button>
+    <button onclick="LightPosition(6)"> Backward </button>
+    </h4>
+    
+    <h4> Center Of Interest: 
+    <button onclick="CenterOfInterest(1)"> Up </button>
+    <button onclick="CenterOfInterest(2)"> Down </button>
+    <button onclick="CenterOfInterest(3)"> Left </button>
+    <button onclick="CenterOfInterest(4)"> Right </button>
+    <button onclick="CenterOfInterest(5)"> Forward </button>
+    <button onclick="CenterOfInterest(6)"> Backward </button>
+    </h4>
+
+    <h4> Background:  
+    <button  onclick="BG(1,0,0)"> Red </button>
+    <button  onclick="BG(0,1,0)"> Green </button>
+    <button  onclick="BG(0,0,1)"> Blue </button>
+    <button  onclick="BG(0.5,0.5,0.5)"> Grey </button>
+    <button  onclick="BG(0,0,0)"> Black </button>
+    <button  onclick="BG(1,1,1)"> White </button>
+    </h4>
+
+    <h4> Geometry:  
+    <button  onclick="geometry(0)"> Points </button>
+    <button  onclick="geometry(1)"> Lines </button>
+    <button  onclick="geometry(2)"> Faces </button>
+    </h4>
+    
+    <button onclick="redraw()"> Reset Scene </button>
+ <div>
+        <h3>
+          <div id="title"> code07.html COMMENTS</div>
+        </h3>
+        <h5>
+	  </h5> 
+  </div>
+
+  
+    
+
+</body>
+
+</html>
+
