@@ -4,8 +4,17 @@ body {
   background-repeat  : no-repeat;
   background-size    : cover; 
 }
-p.intro {
+h2 {
+	font-family : monospace;
 	font-weight : bold;
-	font-size   : 16px;
+	font-size   : 20px;
 	white-space : pre;
+	tab-size    : 4
+}
+p.intro {
+	font-family : monospace;
+	font-weight : bold;
+	font-size   : 14px;
+	white-space : pre;
+	tab-size    : 4
 }
