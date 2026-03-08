@@ -58,13 +58,16 @@ function initShaders() {
 
     if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
         console.error("Could not link shaderProgram:", gl.getProgramInfoLog(shaderProgram));
+        return false;
     }
     if (!gl.getProgramParameter(phongshaderProgram, gl.LINK_STATUS)) {
         console.error("Could not link phongshaderProgram:", gl.getProgramInfoLog(phongshaderProgram));
+        return false;
     }
     if (!gl.getProgramParameter(textureshaderProgram, gl.LINK_STATUS)) {
         console.error("Could not link textureshaderProgram:", gl.getProgramInfoLog(textureshaderProgram));
+        return false;
     }
-
+    return true;
 }
 

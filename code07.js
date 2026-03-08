@@ -1578,7 +1578,9 @@ function webGLStart() {
   if (!gl) {
     return;
   }
-  initShaders();
+  if (!initShaders()) {
+    return;
+  }
 
   gl.enable(gl.DEPTH_TEST);
 
