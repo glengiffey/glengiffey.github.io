@@ -499,13 +499,11 @@ function initCylinderBuffers() {
   var cyverts = [];
   var cynormals = []; 
   var cycolors = []; 
-  var cyindicies = [];
+  var cyIndices = [];
 
   var nslices = 50;
   var nstacks = 25;
 
-  var nvertices = nslices * nstacks;
-    
   var Dangle = 2*Math.PI/(nslices-1); 
 
   for (var j = 0; j < nstacks; j++) {
@@ -542,12 +540,12 @@ function initCylinderBuffers() {
       var idx5 = (j) * nslices + mi2;
       var idx6 = (j+1) * nslices + mi2;
   
-      cyindicies.push(idx); 
-      cyindicies.push(idx2);
-      cyindicies.push(idx3); 
-      cyindicies.push(idx4);
-      cyindicies.push(idx5); 
-      cyindicies.push(idx6);
+      cyIndices.push(idx); 
+      cyIndices.push(idx2);
+      cyIndices.push(idx3); 
+      cyIndices.push(idx4);
+      cyIndices.push(idx5); 
+      cyIndices.push(idx6);
     }
   }
   
@@ -565,7 +563,7 @@ function initCylinderBuffers() {
 
   cylinderVertexIndexBuffer = gl.createBuffer();  
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cylinderVertexIndexBuffer); 
-  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(cyindicies), gl.STATIC_DRAW);  
+  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(cyIndices), gl.STATIC_DRAW);  
   cylinderVertexIndexBuffer.itemSize = 1;
   cylinderVertexIndexBuffer.numItems = (nstacks-1)*6*(nslices+1);
 
@@ -931,8 +929,6 @@ function initModels() {
 
 var sampleTexture; 
 var cubemapTexture;
-var src = ["posx.jpg", "negx.jpg", "posy.jpg", "negy.jpg", "posz.jpg", "negz.jpg"];
-
 function initCubeMap() {
 	gl.activeTexture(gl.TEXTURE1);
 	cubemapTexture = gl.createTexture();
