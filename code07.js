@@ -166,6 +166,7 @@ function handleSkyBoxTextureLoaded(texture, i) {
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
   gl.bindTexture(gl.TEXTURE_2D, null);
+  drawScene();
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -875,7 +876,9 @@ function handleLoadedTeapot(teapotData) {
     console.log("*****ymin = "+ymin + "ymax = "+ymax);
     console.log("*****zmin = "+zmin + "zmax = "+zmax);       
 
-    teapotVertexColorBuffer = teapotVertexNormalBuffer;
+	    teapotVertexColorBuffer = teapotVertexNormalBuffer;
+
+	    drawScene();
 }
 
 ///////////////////////////////////////////////////////////////
@@ -937,11 +940,11 @@ function initCubeMap() {
     ];
     for (var i = 0; i < 6; i++) {
         img[i] = new Image();
-        img[i].onload = function() {
-            ct++;
-            if (ct == 6) {
-                gl.activeTexture(gl.TEXTURE1);
-                gl.bindTexture(gl.TEXTURE_CUBE_MAP, cubemapTexture);
+	        img[i].onload = function() {
+	            ct++;
+	            if (ct == 6) {
+	                gl.activeTexture(gl.TEXTURE1);
+	                gl.bindTexture(gl.TEXTURE_CUBE_MAP, cubemapTexture);
                 var targets = [
                    gl.TEXTURE_CUBE_MAP_POSITIVE_X, gl.TEXTURE_CUBE_MAP_NEGATIVE_X, 
                    gl.TEXTURE_CUBE_MAP_POSITIVE_Y, gl.TEXTURE_CUBE_MAP_NEGATIVE_Y, 
@@ -951,12 +954,13 @@ function initCubeMap() {
                     gl.texImage2D(targets[j], 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img[j]);
                     gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
                     gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-                }
-                gl.generateMipmap(gl.TEXTURE_CUBE_MAP);
-            }
-        }
-        img[i].src = urls[i];
-    }
+	                }
+	                gl.generateMipmap(gl.TEXTURE_CUBE_MAP);
+	                drawScene();
+	            }
+	        }
+	        img[i].src = urls[i];
+	    }
 
     ///////////////
 	/*
@@ -1068,6 +1072,7 @@ function handleTextureLoaded(texture) {
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
   gl.bindTexture(gl.TEXTURE_2D, null);
+  drawScene();
 }
 
 var xmin, xmax, ymin, ymax, zmin, zmax;
