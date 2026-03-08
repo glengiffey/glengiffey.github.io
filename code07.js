@@ -1167,8 +1167,6 @@ function drawScene() {
   drawSkybox();
   gl.useProgram(phongshaderProgram);
 
-  phongshaderProgram.light_posUniform = gl.getUniformLocation(phongshaderProgram, "light_pos");
-
   gl.uniform4f(phongshaderProgram.light_posUniform,light_pos[0], light_pos[1], light_pos[2], light_pos[3]);  
 
   gl.uniform4f(phongshaderProgram.light_ambientUniform, light_ambient[0], light_ambient[1], light_ambient[2], 1.0); 
