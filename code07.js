@@ -1080,7 +1080,7 @@ function find_range(positions) {
   xmin = xmax = positions[0];
   ymin = ymax = positions[1];
   zmin = zmax = positions[2];
-  for (i = 0; i< positions.length/3; i++) {
+  for (var i = 0; i < positions.length/3; i++) {
   if (positions[i*3] < xmin) xmin = positions[i*3];
   if (positions[i*3] > xmax) xmax = positions[i*3];   
 
@@ -1574,6 +1574,9 @@ function onKeyDown(event) {
 function webGLStart() {
   var canvas = document.getElementById("code03-canvas");
   initGL(canvas);
+  if (!gl) {
+    return;
+  }
   initShaders();
 
   gl.enable(gl.DEPTH_TEST);
