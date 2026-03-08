@@ -354,7 +354,6 @@ function initSphereBuffers() {
   var latitudeBands = 30;
   var longitudeBands = 30;
   var radius = 1;
-  var c = [ 0, 0, 0];
 
   var vertexPositionData = [];
   var vertexNormals = [ ];
@@ -372,8 +371,6 @@ function initSphereBuffers() {
           var x = cosPhi * sinTheta;
           var y = cosTheta;
           var z = sinPhi * sinTheta;
-          var u = 1 - (longNumber / longitudeBands);
-          var v = 1 - (latNumber / latitudeBands);
 
           vertexNormals.push(x);
           vertexNormals.push(y);
@@ -435,9 +432,6 @@ function initCircleBuffers() {
   var bcirverts = [];
   var tcirnormals = [];
   var bcirnormals = [];
-  var circolors = [];
-  var cirindices = [];
-
   var nslices = 50;
 
   var Dangle= 2*Math.PI/(nslices-1);
