@@ -377,7 +377,7 @@ function initSphereBuffers() {
 
           vertexNormals.push(x);
           vertexNormals.push(y);
-          vertexNormals.push(-z);
+          vertexNormals.push(z);
           vertexColorData.push(1);
           vertexColorData.push(0.0);
           vertexColorData.push(0.0);
