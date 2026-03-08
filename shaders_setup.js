@@ -46,6 +46,11 @@ function initShaders() {
     var texturefragmentShader = getShader(gl, "texture-shader-fs");
     var vertexShader = getShader(gl, "shader-vs");
 
+    if (!vertexShader || !fragmentShader || !phongfragmentShader || !texturefragmentShader) {
+        console.error("One or more shaders failed to compile; aborting program link.");
+        return false;
+    }
+
     gl.attachShader(shaderProgram, vertexShader);
     gl.attachShader(shaderProgram, fragmentShader);
     gl.attachShader(phongshaderProgram, vertexShader);
