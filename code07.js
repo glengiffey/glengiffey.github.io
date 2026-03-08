@@ -626,7 +626,8 @@ function initSkybox(){
                      ];
 
 
-  var indices = [0,1,2, 1,2,3];
+  // Two non-overlapping triangles that cover the full quad.
+  var indices = [0,1,2, 0,2,3];
   ///////////// PX
 
   skyboxpxVertexPositionBuffer= gl.createBuffer(); 
