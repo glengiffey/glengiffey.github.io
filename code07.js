@@ -1511,6 +1511,7 @@ function onDocumentMouseMove( event ) {
 
   if(control_type==1) {
     mat4.rotate(rMatrix, degToRad(X_angle), [0,1,0]);
+    mat4.rotate(rMatrix, degToRad(Z_angle), [1,0,0]);
   }
   else if(control_type==2) {
     mat4.rotateY(model, degToRad(X_angle));
