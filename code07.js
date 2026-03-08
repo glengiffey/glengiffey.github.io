@@ -764,6 +764,7 @@ function drawScene() {
   }
   gl.useProgram(teapotProgram);
 
+  mat4.multiply(mMatrix, model);
   mMatrix = mat4.scale(mMatrix, [2/10, 2/10, 2/10]);
   gl.bindBuffer(gl.ARRAY_BUFFER, teapotVertexPositionBuffer);
   gl.vertexAttribPointer(teapotProgram.vertexPositionAttribute, teapotVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
