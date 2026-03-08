@@ -27,7 +27,7 @@ function getShader(gl, id) {
     gl.compileShader(shader);
 
     if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-        alert(gl.getShaderInfoLog(shader));
+        console.error("Shader compile error:", gl.getShaderInfoLog(shader));
         return null;
     }
 
@@ -46,6 +46,11 @@ function initShaders() {
     var texturefragmentShader = getShader(gl, "texture-shader-fs");
     var vertexShader = getShader(gl, "shader-vs");
 
+    if (!vertexShader || !fragmentShader || !phongfragmentShader || !texturefragmentShader) {
+        console.error("One or more shaders failed to compile; aborting program link.");
+        return false;
+    }
+
     gl.attachShader(shaderProgram, vertexShader);
     gl.attachShader(shaderProgram, fragmentShader);
     gl.attachShader(phongshaderProgram, vertexShader);
@@ -57,14 +62,17 @@ function initShaders() {
     gl.linkProgram(textureshaderProgram);
 
     if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
-        alert("Could not initialise shaders");
+        console.error("Could not link shaderProgram:", gl.getProgramInfoLog(shaderProgram));
+        return false;
     }
-        if (!gl.getProgramParameter(phongshaderProgram, gl.LINK_STATUS)) {
-        alert("Could not initialise shaders");
+    if (!gl.getProgramParameter(phongshaderProgram, gl.LINK_STATUS)) {
+        console.error("Could not link phongshaderProgram:", gl.getProgramInfoLog(phongshaderProgram));
+        return false;
     }
-        if (!gl.getProgramParameter(textureshaderProgram, gl.LINK_STATUS)) {
-        alert("Could not initialise shaders");
+    if (!gl.getProgramParameter(textureshaderProgram, gl.LINK_STATUS)) {
+        console.error("Could not link textureshaderProgram:", gl.getProgramInfoLog(textureshaderProgram));
+        return false;
     }
-
+    return true;
 }
 

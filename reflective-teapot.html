@@ -1,11 +1,12 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
 
 <head>
-<title>hwshen WebGL &mdash; code07 </title>
-<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+<title>Glen Giffey &mdash; Reflective Teapot</title>
+<link rel="icon" href="data:,">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 
 <script type="text/javascript" src="glMatrix-0.9.5.min.js"></script>
 
@@ -41,15 +42,44 @@
    varying vec4 vColor; 
 
    void main(void) {
+     vec3 view_vector = normalize(-vec3(eye_pos));
+     vec3 normal = normalize(v_normal);
 
-     vec3 view_vector, ref; 
-     vec4 env_color = vec4(1,0,0,1);
+     // Reflection lookup from eye space to world space.
+     vec3 ref = normalize(reflect(-view_vector, normal));
+     ref = vec3(uV2WMatrix * vec4(ref, 0.0));
+     vec4 env_color = textureCube(cubeMap, ref);
 
-          view_vector = normalize(vec3(vec4(0,0,0,1)-eye_pos));
-          ref = normalize(reflect(-view_vector, v_normal));  // in eye space
-          ref = vec3(uV2WMatrix*vec4(ref,0));   // convert to world space
-          env_color = textureCube(cubeMap, ref);
-          gl_FragColor = env_color;
+     // Phong lighting in eye space.
+     vec4 light_pos_in_eye = uVMatrix * light_pos;
+     vec3 light_vector = normalize(vec3(light_pos_in_eye - eye_pos));
+     float ndotl = max(dot(normal, light_vector), 0.0);
+
+     vec4 ambient = ambient_coef * light_ambient;
+     vec4 diffuse = diffuse_coef * light_diffuse * ndotl;
+
+     vec3 R = normalize(reflect(-light_vector, normal));
+     float rdotv = max(dot(R, view_vector), 0.0);
+     vec4 specular = (ndotl > 0.0)
+       ? specular_coef * light_specular * pow(rdotv, mat_shininess)
+       : vec4(0.0, 0.0, 0.0, 1.0);
+
+     vec4 phong_color = ambient + diffuse + specular;
+
+     // Brushed-brass look: warm base with tempered, tinted reflection.
+     vec3 brass_base = vec3(0.78, 0.62, 0.22);
+     vec3 brass_reflection_tint = vec3(1.00, 0.90, 0.70);
+     vec3 base_rgb = phong_color.rgb * brass_base;
+     vec3 reflected_rgb = env_color.rgb * brass_reflection_tint;
+
+     // Make reflection depend on both view angle (Fresnel) and lighting.
+     float ndotv = max(dot(normal, view_vector), 0.0);
+     float fresnel = pow(1.0 - ndotv, 3.0);
+     float spec_strength = clamp(max(specular.r, max(specular.g, specular.b)), 0.0, 1.0);
+     float light_visibility = clamp(0.28 + 0.75 * ndotl + 0.35 * spec_strength, 0.0, 1.0);
+     float reflection_weight = clamp((0.18 + 0.35 * fresnel) * light_visibility, 0.0, 0.65);
+
+     gl_FragColor = vec4(mix(base_rgb, reflected_rgb, reflection_weight), 1.0);
 
 }
 </script>
@@ -136,15 +166,42 @@ void main(void) {
    uniform mat4 uNMatrix;    // normal matrix 
    uniform mat4 uV2WMatrix;  // eye to world 
 
+   uniform vec4 light_pos;
+   uniform vec4 ambient_coef;
+   uniform vec4 diffuse_coef;
+   uniform vec4 specular_coef;
+   uniform float mat_shininess;
+   uniform vec4 light_ambient;
+   uniform vec4 light_diffuse;
+   uniform vec4 light_specular;
+
    uniform sampler2D myTexture;
 
+   varying vec4 eye_pos;
+   varying vec3 v_normal;
    varying highp vec2 FtexCoord; 
    varying vec4 vColor; 
 
    void main(void) {
-      vec4 texcolor;
-      texcolor = texture2D(myTexture, FtexCoord); 
-      gl_FragColor = texcolor; 
+      vec4 texcolor = texture2D(myTexture, FtexCoord);
+      vec3 normal = normalize(v_normal);
+      vec3 view_vector = normalize(-vec3(eye_pos));
+
+      vec4 light_pos_in_eye = uVMatrix * light_pos;
+      vec3 light_vector = normalize(vec3(light_pos_in_eye - eye_pos));
+      float ndotl = max(dot(normal, light_vector), 0.0);
+
+      vec4 ambient = ambient_coef * light_ambient;
+      vec4 diffuse = diffuse_coef * light_diffuse * ndotl;
+
+      vec3 R = normalize(reflect(-light_vector, normal));
+      float rdotv = max(dot(R, view_vector), 0.0);
+      vec4 specular = (ndotl > 0.0)
+        ? specular_coef * light_specular * pow(rdotv, mat_shininess)
+        : vec4(0.0, 0.0, 0.0, 1.0);
+
+      vec3 lit_tex = texcolor.rgb * (ambient.rgb + diffuse.rgb) + specular.rgb;
+      gl_FragColor = vec4(lit_tex, texcolor.a);
 }
 </script>
 
@@ -189,7 +246,7 @@ void main(void) {
 
   void main(void) {
     // transform normal from local to eye space: normal matrix is the inverse transpose of the modelview matrix 
-    v_normal = normalize(vec3(uNMatrix*vec4(aVertexNormal, 1.0)));
+    v_normal = normalize(vec3(uNMatrix*vec4(aVertexNormal, 0.0)));
     // transform the vertex position to eye space 
     eye_pos = uVMatrix*uMMatrix*vec4(aVertexPosition, 1.0);
 
@@ -210,75 +267,78 @@ void main(void) {
 
 
 <body onload="webGLStart();">
-    <canvas id="code03-canvas"style="border:none;"width="700"height="700"></canvas>
+    <canvas id="code03-canvas" style="border: none;" width="700" height="700"></canvas>
     
     <div>
     <h4>
-    Click on the left mouse button and move the coursor to rotate
+    Click on the left mouse button and move the cursor to rotate
     </h4>
     </div>
 
     <h4> Texture:  </h4>
-    <button  onclick="texture(0)"> NO  </button>
+    <button  onclick="texture(0)"> Flat </button>
     <button  onclick="texture(1)"> Regular </button>
     <button  onclick="texture(2)"> Cubemap </button>
 
     <h4> Selection (Select which object to control):
     <button onclick="Control(1)"> Environment </button>
     <button onclick="Control(2)"> Object </button>
-    <button onclick="Control(3)"> Arms </button>
     <button onclick="Control(4)"> Roll Camera </button>
-    <button onclick="Control(0)"> Sliders </button>
+    </h4>
 
-    <h4> Camera: 
+    <h4> Camera:
     <button onclick="CameraPosition(1)"> Up </button>
     <button onclick="CameraPosition(2)"> Down </button>
     <button onclick="CameraPosition(3)"> Left </button>
     <button onclick="CameraPosition(4)"> Right </button>
     <button onclick="CameraPosition(5)"> Forward </button>
     <button onclick="CameraPosition(6)"> Backward </button>
+    <button onclick="ResetCamera()"> Reset </button>
     </h4>
     <h4> Ambient Intensity (R)
-    <input type="range" min="0" max="100" value="0" step="5" onchange="AmbientIntensity(this.value, -1, -1)" />
+    <input type="range" min="0" max="100" value="12" step="5" onchange="AmbientIntensity(this.value, -1, -1)" />
      Ambient Intensity (G)
-    <input type="range" min="0" max="100" value="0" step="5" onchange="AmbientIntensity(-1, this.value, -1)" />
+    <input type="range" min="0" max="100" value="12" step="5" onchange="AmbientIntensity(-1, this.value, -1)" />
      Ambient Intensity (B)
-    <input type="range" min="0" max="100" value="0" step="5" onchange="AmbientIntensity(-1, -1, this.value)" />
+    <input type="range" min="0" max="100" value="12" step="5" onchange="AmbientIntensity(-1, -1, this.value)" />
     </h4>
     <h4> Diffuse Intensity (R)
-    <input type="range" min="0" max="100" value="80" step="5" onchange="DiffuseIntensity(this.value, -1, -1)" />
+    <input type="range" min="0" max="100" value="58" step="5" onchange="DiffuseIntensity(this.value, -1, -1)" />
      Diffuse Intensity (G)
-    <input type="range" min="0" max="100" value="80" step="5" onchange="DiffuseIntensity(-1, this.value, -1)" />
+    <input type="range" min="0" max="100" value="58" step="5" onchange="DiffuseIntensity(-1, this.value, -1)" />
      Diffuse Intensity (B)
-    <input type="range" min="0" max="100" value="80" step="5" onchange="DiffuseIntensity(-1, -1, this.value)" />
+    <input type="range" min="0" max="100" value="58" step="5" onchange="DiffuseIntensity(-1, -1, this.value)" />
     </h4>
     <h4> Specular Intensity (R)
-    <input type="range" min="0" max="100" value="100" step="5" onchange="SpecularIntensity(this.value, -1, -1)" />
+    <input type="range" min="0" max="100" value="55" step="5" onchange="SpecularIntensity(this.value, -1, -1)" />
      Specular Intensity (G)
-    <input type="range" min="0" max="100" value="100" step="5" onchange="SpecularIntensity( -1, this.value, -1)" />
+    <input type="range" min="0" max="100" value="55" step="5" onchange="SpecularIntensity( -1, this.value, -1)" />
      Specular Intensity (B)
-    <input type="range" min="0" max="100" value="100" step="5" onchange="SpecularIntensity( -1, -1, this.value)" />
+    <input type="range" min="0" max="100" value="55" step="5" onchange="SpecularIntensity( -1, -1, this.value)" />
     </h4>
     
-    <h4> Light: 
+    <h4> Light:
     <button onclick="LightPosition(1)"> Up </button>
     <button onclick="LightPosition(2)"> Down </button>
     <button onclick="LightPosition(3)"> Left </button>
     <button onclick="LightPosition(4)"> Right </button>
     <button onclick="LightPosition(5)"> Forward </button>
     <button onclick="LightPosition(6)"> Backward </button>
+    <button onclick="ResetLight()"> Reset </button>
     </h4>
     
-    <h4> Center Of Interest: 
+    <h4> Center Of Interest:
     <button onclick="CenterOfInterest(1)"> Up </button>
     <button onclick="CenterOfInterest(2)"> Down </button>
     <button onclick="CenterOfInterest(3)"> Left </button>
     <button onclick="CenterOfInterest(4)"> Right </button>
     <button onclick="CenterOfInterest(5)"> Forward </button>
     <button onclick="CenterOfInterest(6)"> Backward </button>
+    <button onclick="ResetCenterOfInterest()"> Reset </button>
     </h4>
 
-    <h4> Background:  
+    <h4> Background:
+    <button  onclick="BGSkybox()"> Skybox </button>
     <button  onclick="BG(1,0,0)"> Red </button>
     <button  onclick="BG(0,1,0)"> Green </button>
     <button  onclick="BG(0,0,1)"> Blue </button>
@@ -294,18 +354,9 @@ void main(void) {
     </h4>
     
     <button onclick="redraw()"> Reset Scene </button>
- <div>
-        <h3>
-          <div id="title"> code07.html COMMENTS</div>
-        </h3>
-        <h5>
-	  </h5> 
-  </div>
 
-  
-    
+
 
 </body>
 
 </html>
-
