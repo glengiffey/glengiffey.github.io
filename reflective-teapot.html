@@ -70,8 +70,15 @@
      vec3 brass_reflection_tint = vec3(1.00, 0.90, 0.70);
      vec3 base_rgb = phong_color.rgb * brass_base;
      vec3 reflected_rgb = env_color.rgb * brass_reflection_tint;
-     float reflectivity = 0.42;
-     gl_FragColor = vec4(mix(base_rgb, reflected_rgb, reflectivity), 1.0);
+
+     // Make reflection depend on both view angle (Fresnel) and lighting.
+     float ndotv = max(dot(normal, view_vector), 0.0);
+     float fresnel = pow(1.0 - ndotv, 3.0);
+     float spec_strength = clamp(max(specular.r, max(specular.g, specular.b)), 0.0, 1.0);
+     float light_visibility = clamp(0.28 + 0.75 * ndotl + 0.35 * spec_strength, 0.0, 1.0);
+     float reflection_weight = clamp((0.18 + 0.35 * fresnel) * light_visibility, 0.0, 0.65);
+
+     gl_FragColor = vec4(mix(base_rgb, reflected_rgb, reflection_weight), 1.0);
 
 }
 </script>
