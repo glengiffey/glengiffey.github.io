@@ -120,39 +120,39 @@ var skynzTexture;
 function initSkyBoxTextures() {
     skypxTexture = gl.createTexture();
     skypxTexture.image = new Image();
-    skypxTexture.image.onload = function() { handleTextureLoaded(skypxTexture, 2); }
+    skypxTexture.image.onload = function() { handleSkyBoxTextureLoaded(skypxTexture, 2); }
     skypxTexture.image.src = "posx.jpg";
-    console.log("loading texture....") 
+    console.log("loading texture....")
 
     skynxTexture = gl.createTexture();
     skynxTexture.image = new Image();
-    skynxTexture.image.onload = function() { handleTextureLoaded(skynxTexture, 3); }
+    skynxTexture.image.onload = function() { handleSkyBoxTextureLoaded(skynxTexture, 3); }
     skynxTexture.image.src = "negx.jpg";
-    console.log("loading texture....") 
+    console.log("loading texture....")
 
     skypyTexture = gl.createTexture();
     skypyTexture.image = new Image();
-    skypyTexture.image.onload = function() { handleTextureLoaded(skypyTexture, 4); }
+    skypyTexture.image.onload = function() { handleSkyBoxTextureLoaded(skypyTexture, 4); }
     skypyTexture.image.src = "posy.jpg";
-    console.log("loading texture....") 
+    console.log("loading texture....")
 
     skynyTexture = gl.createTexture();
     skynyTexture.image = new Image();
-    skynyTexture.image.onload = function() { handleTextureLoaded(skynyTexture, 5); }
+    skynyTexture.image.onload = function() { handleSkyBoxTextureLoaded(skynyTexture, 5); }
     skynyTexture.image.src = "negy.jpg";
-    console.log("loading texture....") 
+    console.log("loading texture....")
 
     skypzTexture = gl.createTexture();
     skypzTexture.image = new Image();
-    skypzTexture.image.onload = function() { handleTextureLoaded(skypzTexture, 6); }
+    skypzTexture.image.onload = function() { handleSkyBoxTextureLoaded(skypzTexture, 6); }
     skypzTexture.image.src = "posz.jpg";
-    console.log("loading texture....") 
+    console.log("loading texture....")
 
     skynzTexture = gl.createTexture();
     skynzTexture.image = new Image();
-    skynzTexture.image.onload = function() { handleTextureLoaded(skynzTexture, 7); }
+    skynzTexture.image.onload = function() { handleSkyBoxTextureLoaded(skynzTexture, 7); }
     skynzTexture.image.src = "negz.jpg";
-    console.log("loading texture....") 
+    console.log("loading texture....")
 }
 
 function handleSkyBoxTextureLoaded(texture, i) {
@@ -221,7 +221,7 @@ function initSquareBuffers() {
   squareVertexIndexBuffer = gl.createBuffer();  
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, squareVertexIndexBuffer); 
   gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(sqindices), gl.STATIC_DRAW);  
-  squareVertexIndexBuffer.itemsize = 1;
+  squareVertexIndexBuffer.itemSize = 1;
   squareVertexIndexBuffer.numItems = 6;  
 
   squareVertexColorBuffer = gl.createBuffer();
@@ -274,7 +274,7 @@ function initRectangleBuffers() {
         ];
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
   rectangleVertexPositionBuffer.itemSize = 3;
-  rectangleVertexPositionBuffer.numItems = 8;
+  rectangleVertexPositionBuffer.numItems = 24;
 
   //Calculate Rectangle Normals
   var vertexNormals = [
@@ -440,7 +440,6 @@ function initCircleBuffers() {
 
   var Dangle= 2*Math.PI/(nslices-1);
   for(var i=0; i<nslices; i++){
-    var idx = j*nslices + i; // mesh[j][i] 
     var angle = Dangle * i;
   
     tcirverts.push(Math.cos(angle)/2); 
@@ -489,7 +488,7 @@ function initCircleBuffers() {
   for(var j = 0; j<nslices+2; j++){
     colors.push(0.0, 0.5, 0.0, 1.0);
   }
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(circolors), gl.STATIC_DRAW);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
   circleVertexColorBuffer.itemSize = 4;
   circleVertexColorBuffer.numItems = nslices;
 }
@@ -554,7 +553,7 @@ function initCylinderBuffers() {
   gl.bindBuffer(gl.ARRAY_BUFFER, cylinderVertexPositionBuffer);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(cyverts), gl.STATIC_DRAW);
   cylinderVertexPositionBuffer.itemSize = 3;
-  cylinderVertexPositionBuffer.numItems = nslices * nstacks + nslices;
+  cylinderVertexPositionBuffer.numItems = nslices * nstacks;
 
   cylinderVertexNormalBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, cylinderVertexNormalBuffer);
@@ -565,7 +564,7 @@ function initCylinderBuffers() {
   cylinderVertexIndexBuffer = gl.createBuffer();  
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cylinderVertexIndexBuffer); 
   gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(cyindicies), gl.STATIC_DRAW);  
-  cylinderVertexIndexBuffer.itemsize = 1;
+  cylinderVertexIndexBuffer.itemSize = 1;
   cylinderVertexIndexBuffer.numItems = (nstacks-1)*6*(nslices+1);
 
   cylinderVertexColorBuffer = gl.createBuffer();
@@ -661,10 +660,10 @@ function initSkybox(){
   skyboxpxVertexNormalBuffer.itemSize = 3; 
   skyboxpxVertexNormalBuffer.numItems = 4;
 
-  skyboxpxVertexIndexBuffer= gl.createBuffer(); 
-  gl.bindBuffer(gl.ARRAY_BUFFER, skyboxpxVertexIndexBuffer); 
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(indices), gl.STATIC_DRAW); 
-  skyboxpxVertexIndexBuffer.itemSize = 1; 
+  skyboxpxVertexIndexBuffer= gl.createBuffer();
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, skyboxpxVertexIndexBuffer);
+  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
+  skyboxpxVertexIndexBuffer.itemSize = 1;
   skyboxpxVertexIndexBuffer.numItems = 6;
 
   /////////// NX
@@ -693,10 +692,10 @@ function initSkybox(){
   skyboxnxVertexNormalBuffer.itemSize = 3; 
   skyboxnxVertexNormalBuffer.numItems = 4;
 
-  skyboxnxVertexIndexBuffer= gl.createBuffer(); 
-  gl.bindBuffer(gl.ARRAY_BUFFER, skyboxnxVertexIndexBuffer); 
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(indices), gl.STATIC_DRAW); 
-  skyboxnxVertexIndexBuffer.itemSize = 1; 
+  skyboxnxVertexIndexBuffer= gl.createBuffer();
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, skyboxnxVertexIndexBuffer);
+  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
+  skyboxnxVertexIndexBuffer.itemSize = 1;
   skyboxnxVertexIndexBuffer.numItems = 6;
 
   ////////////// PY
@@ -725,10 +724,10 @@ function initSkybox(){
   skyboxpyVertexNormalBuffer.itemSize = 3; 
   skyboxpyVertexNormalBuffer.numItems = 4;
 
-  skyboxpyVertexIndexBuffer= gl.createBuffer(); 
-  gl.bindBuffer(gl.ARRAY_BUFFER, skyboxpyVertexIndexBuffer); 
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(indices), gl.STATIC_DRAW); 
-  skyboxpyVertexIndexBuffer.itemSize = 1; 
+  skyboxpyVertexIndexBuffer= gl.createBuffer();
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, skyboxpyVertexIndexBuffer);
+  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
+  skyboxpyVertexIndexBuffer.itemSize = 1;
   skyboxpyVertexIndexBuffer.numItems = 6;
 
   ///////////////// NY
@@ -757,10 +756,10 @@ function initSkybox(){
   skyboxnyVertexNormalBuffer.itemSize = 3; 
   skyboxnyVertexNormalBuffer.numItems = 4;
 
-  skyboxnyVertexIndexBuffer= gl.createBuffer(); 
-  gl.bindBuffer(gl.ARRAY_BUFFER, skyboxnyVertexIndexBuffer); 
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(indices), gl.STATIC_DRAW); 
-  skyboxnyVertexIndexBuffer.itemSize = 1; 
+  skyboxnyVertexIndexBuffer= gl.createBuffer();
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, skyboxnyVertexIndexBuffer);
+  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
+  skyboxnyVertexIndexBuffer.itemSize = 1;
   skyboxnyVertexIndexBuffer.numItems = 6;
 
   ///////// PZ
@@ -789,10 +788,10 @@ function initSkybox(){
   skyboxpzVertexNormalBuffer.itemSize = 3; 
   skyboxpzVertexNormalBuffer.numItems = 4;
 
-  skyboxpzVertexIndexBuffer= gl.createBuffer(); 
-  gl.bindBuffer(gl.ARRAY_BUFFER, skyboxpzVertexIndexBuffer); 
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(indices), gl.STATIC_DRAW); 
-  skyboxpzVertexIndexBuffer.itemSize = 1; 
+  skyboxpzVertexIndexBuffer= gl.createBuffer();
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, skyboxpzVertexIndexBuffer);
+  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
+  skyboxpzVertexIndexBuffer.itemSize = 1;
   skyboxpzVertexIndexBuffer.numItems = 6;
 
   ////////////// Ny
@@ -821,35 +820,22 @@ function initSkybox(){
   skyboxnzVertexNormalBuffer.itemSize = 3; 
   skyboxnzVertexNormalBuffer.numItems = 4;
 
-  skyboxnzVertexIndexBuffer= gl.createBuffer(); 
-  gl.bindBuffer(gl.ARRAY_BUFFER, skyboxnzVertexIndexBuffer); 
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(indices), gl.STATIC_DRAW); 
-  skyboxnzVertexIndexBuffer.itemSize = 1; 
+  skyboxnzVertexIndexBuffer= gl.createBuffer();
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, skyboxnzVertexIndexBuffer);
+  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
+  skyboxnzVertexIndexBuffer.itemSize = 1;
   skyboxnzVertexIndexBuffer.numItems = 6;
 }
 
 ////////////////    Initialize JSON geometry file ///////////
-
-function initJSON() {
-  var request = new  XMLHttpRequest();
-  request.open("GET", "teapot.json");
-  request.onreadystatechange =
-    function () {
-      if (request.readyState == 4) {
-        console.log("state ="+request.readyState); 
-        handleLoadedTeapot(JSON.parse(request.responseText));
-      }
-    }
-  request.send();
-}
 
 function initTeapotJSON() {
   var request = new  XMLHttpRequest();
   request.open("GET", "teapot.json");
   request.onreadystatechange =
     function () {
-      if (request.readyState == 4) {
-        console.log("state ="+request.readyState); 
+      if (request.readyState == 4 && request.status == 200) {
+        console.log("state ="+request.readyState);
         handleLoadedTeapot(JSON.parse(request.responseText));
       }
     }
@@ -1072,7 +1058,8 @@ function initTextures() {
   sampleTexture = gl.createTexture();
   sampleTexture.image = new Image();
   sampleTexture.image.onload = function() { handleTextureLoaded(sampleTexture); }
-  sampleTexture.image.src = "brick.png";    
+  sampleTexture.image.onerror = function() { console.warn("brick.png not found; regular texture mode unavailable"); }
+  sampleTexture.image.src = "brick.png";
   console.log("loading texture....")
 }
 
@@ -1176,8 +1163,7 @@ function drawScene() {
 
   mat4.identity(v2wMatrix);
   v2wMatrix = mat4.multiply(v2wMatrix, vMatrix);
-  //v2wMatrix = mat4.inverse(v2wMatrix);     
-  v2wMatrix = mat4.transpose(v2wMatrix); 
+  v2wMatrix = mat4.inverse(v2wMatrix);
   drawSkybox();
   gl.useProgram(phongshaderProgram);
 
@@ -1503,7 +1489,7 @@ function onDocumentMouseDown( event ) {
 
 function onDocumentMouseMove( event ) {
   var mouseX = event.clientX;
-  var mouseY = event.ClientY; 
+  var mouseY = event.clientY;
 
   var diffX = mouseX - lastMouseX;
   var diffY = mouseY - lastMouseY;
@@ -1655,7 +1641,7 @@ function webGLStart() {
   mat4.identity(rMatrix);
 
   gl.clearColor(0.0, 0.0, 0.0, 1.0);
-  console.error('*****');
+  console.log('*****');
 
   document.addEventListener('mousedown', onDocumentMouseDown, false); 
   document.addEventListener('keydown', onKeyDown, false);
@@ -1665,7 +1651,7 @@ function webGLStart() {
   X_angle = 0;
   Z_angle = 0;
 
-  console.error("draw");
+  console.log("draw");
   drawScene();
 }
 
@@ -1695,25 +1681,25 @@ function CameraPosition( value ) {
 }
 
 function AmbientIntensity( r, g ,b) {
-  if(r>0){ light_ambient[0] = r/100.00; }
-  else if(g>0){ light_ambient[1] = g/100.00; }
-  else if(b>0){ light_ambient[2] = b/100.00; }
+  if(r>=0){ light_ambient[0] = r/100.00; }
+  else if(g>=0){ light_ambient[1] = g/100.00; }
+  else if(b>=0){ light_ambient[2] = b/100.00; }
   console.log("Ambient Intensity = "+light_ambient);
   drawScene();
 }
 
 function DiffuseIntensity( r, g, b) {
-  if(r>0){ light_diffuse[0] = r/100.00; }
-  else if(g>0){ light_diffuse[1] = g/100.00; }
-  else if(b>0){ light_diffuse[2] = b/100.00; }
+  if(r>=0){ light_diffuse[0] = r/100.00; }
+  else if(g>=0){ light_diffuse[1] = g/100.00; }
+  else if(b>=0){ light_diffuse[2] = b/100.00; }
   console.log("Diffuse Intensity = "+light_diffuse);
   drawScene();
 }
 
 function SpecularIntensity( r, g, b) {
-  if(r>0){ light_specular[0] = r/100.00; }
-  else if(g>0){ light_specular[1] = g/100.00; }
-  else if(b>0){ light_specular[2] = b/100.00; }
+  if(r>=0){ light_specular[0] = r/100.00; }
+  else if(g>=0){ light_specular[1] = g/100.00; }
+  else if(b>=0){ light_specular[2] = b/100.00; }
   console.log("Specular Intensity = "+light_specular);
   drawScene();
 }
