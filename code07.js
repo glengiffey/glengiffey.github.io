@@ -933,13 +933,12 @@ function initModels() {
 var sampleTexture; 
 var cubemapTexture;
 function initCubeMap() {
-	gl.activeTexture(gl.TEXTURE1);
 	cubemapTexture = gl.createTexture();
 	var ct = 0;
     var img = new Array(6);
     var urls = [
-       "posx.jpg", "negx.jpg", 
-       "posy.jpg", "negy.jpg", 
+       "posx.jpg", "negx.jpg",
+       "posy.jpg", "negy.jpg",
        "posz.jpg", "negz.jpg"
     ];
     for (var i = 0; i < 6; i++) {
@@ -947,6 +946,7 @@ function initCubeMap() {
         img[i].onload = function() {
             ct++;
             if (ct == 6) {
+                gl.activeTexture(gl.TEXTURE1);
                 gl.bindTexture(gl.TEXTURE_CUBE_MAP, cubemapTexture);
                 var targets = [
                    gl.TEXTURE_CUBE_MAP_POSITIVE_X, gl.TEXTURE_CUBE_MAP_NEGATIVE_X, 
