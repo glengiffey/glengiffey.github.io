@@ -568,33 +568,35 @@ function initCylinderBuffers() {
 }
 
 function initSkybox(){
-  var pxvertices = [ 10.0, 10.0, 10.0,
-                     10.0, 10.0, -10.0,
-                     10.0, -10.0, -10.0,
-                     10.0, -10.0, 10.0 ];
-  var nxvertices = [ -10.0, 10.0, 10.0,
-                     -10.0, 10.0, -10.0,
-                     -10.0, -10.0, -10.0,
-                     -10.0, -10.0, 10.0 ];
+  // Keep skybox comfortably away from scene objects but inside far clip plane.
+  var s = 40.0;
+  var pxvertices = [ s,  s,  s,
+                     s,  s, -s,
+                     s, -s, -s,
+                     s, -s,  s ];
+  var nxvertices = [ -s,  s,  s,
+                     -s,  s, -s,
+                     -s, -s, -s,
+                     -s, -s,  s ];
 
-  var pyvertices = [ 10.0, 10.0, 10.0,
-                     -10.0, 10.0, 10.0,
-                     -10.0, 10.0, -10.0,
-                     10.0, 10.0, -10.0 ];
-  var nyvertices = [ 10.0, -10.0, 10.0,
-                     -10.0, -10.0, 10.0,
-                     -10.0, -10.0, -10.0,
-                     10.0, -10.0, -10.0 ];
+  var pyvertices = [  s, s,  s,
+                     -s, s,  s,
+                     -s, s, -s,
+                      s, s, -s ];
+  var nyvertices = [  s, -s,  s,
+                     -s, -s,  s,
+                     -s, -s, -s,
+                      s, -s, -s ];
 
-  var pzvertices = [ 10.0, 10.0, 10.0,
-                   -10.0,  10.0, 10.0,
-                   -10.0, -10.0, 10.0,
-                    10.0, -10.0, 10.0 ];
+  var pzvertices = [  s,  s, s,
+                     -s,  s, s,
+                     -s, -s, s,
+                      s, -s, s ];
 
-  var nzvertices = [ 10.0, 10.0, -10.0,
-                    -10.0, 10.0, -10.0,
-                    -10.0, -10.0, -10.0,
-                     10.0, -10.0, -10.0 ];
+  var nzvertices = [  s,  s, -s,
+                     -s,  s, -s,
+                     -s, -s, -s,
+                      s, -s, -s ];
 
   var colors = [  1.0, 0.0, 0.0, 1.0,
                   1.0, 0.0, 0.0, 1.0,
