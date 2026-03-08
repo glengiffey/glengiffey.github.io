@@ -1137,10 +1137,6 @@ function PopMatrix() {
 
 ///////////////////////////////////////////////////////////////
 
-var cameraPos;
-var centerofInterest;
-var viewUp;
-
 function drawScene() {
   gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -1798,7 +1794,7 @@ function BG(red, green, blue) {
 } 
 
 function redraw() {
-  cameraPos = [0, 5, 10];
+  cameraPos = [0, 5, -9];
   centerofInterest = [0, 0, 0];
   viewUp = [0, 1, 0];
   X_angle = 0;
