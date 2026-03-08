@@ -7,7 +7,7 @@ var textureshaderProgram;
 var shaderProgram;
 var draw_type=2; 
 var control_type=1;
-var use_texture=0;
+var use_texture=2;
 var show_skybox = true;
 
 // set up the parameters for lighting 
@@ -1328,7 +1328,13 @@ function CenterOfInterest( value ) {
 function BG(red, green, blue) {
     show_skybox = false;
     gl.clearColor(red, green, blue, 1.0);
-    drawScene(); 
+    drawScene();
+}
+
+function BGSkybox() {
+    show_skybox = true;
+    gl.clearColor(0.0, 0.0, 0.0, 1.0);
+    drawScene();
 } 
 
 function redraw() {
@@ -1337,7 +1343,7 @@ function redraw() {
   viewUp = [0, 1, 0];
   X_angle = 0;
   Z_angle = 0;
-  use_texture = 0;
+  use_texture = 2;
   show_skybox = true;
 
   mat4.identity(rMatrix);
