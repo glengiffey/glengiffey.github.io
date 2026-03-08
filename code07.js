@@ -561,7 +561,7 @@ function initCylinderBuffers() {
   gl.bindBuffer(gl.ARRAY_BUFFER, cylinderVertexNormalBuffer);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(cynormals), gl.STATIC_DRAW);
   cylinderVertexNormalBuffer.itemSize = 3;
-  cylinderVertexNormalBuffer.numItems = nslices * nstacks + nslices;    
+  cylinderVertexNormalBuffer.numItems = nslices * nstacks;
 
   cylinderVertexIndexBuffer = gl.createBuffer();  
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cylinderVertexIndexBuffer); 
