@@ -1296,24 +1296,7 @@ function LightPosition( value ) {
 }
 
 function Control( value ) {
-  if(value!=0 && control_type==0){ document.addEventListener('mousedown', onDocumentMouseDown, false); }
-  switch(value){
-    case 1:
-      control_type = 1;
-      break;
-    case 2:
-      control_type = 2;
-      break;
-    case 3:
-      control_type = 3;
-      break;
-    case 4:
-      control_type = 4;
-      break;
-    default:
-      control_type = 0;
-      document.removeEventListener('mousedown', onDocumentMouseDown, false);
-  }
+  control_type = value;
   drawScene();
 }
 
