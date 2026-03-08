@@ -30,12 +30,13 @@ var viewUp = [0, 1, 0];
 function initGL(canvas) {
     try {
         gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
-        gl.viewportWidth = canvas.width;
-        gl.viewportHeight = canvas.height;
     } catch (e) {
         console.error("WebGL context creation failed:", e);
     }
-    if (!gl) {
+    if (gl) {
+        gl.viewportWidth = canvas.width;
+        gl.viewportHeight = canvas.height;
+    } else {
         console.error("Could not initialise WebGL");
     }
 }
