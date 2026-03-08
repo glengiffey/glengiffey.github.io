@@ -1175,6 +1175,9 @@ function drawScene() {
   drawCylinder();
   mat4.identity(mMatrix);
 
+  drawHierarchy();
+  mat4.identity(mMatrix);
+
   if (teapotVertexPositionBuffer == null || teapotVertexNormalBuffer == null || teapotVertexIndexBuffer == null) {
     return;
   }
