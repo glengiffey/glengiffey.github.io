@@ -8,6 +8,7 @@ var shaderProgram;
 var draw_type=2; 
 var control_type=1;
 var use_texture=0;
+var show_skybox = true;
 
 // set up the parameters for lighting 
 var light_ambient = [0,0,0,1]; 
@@ -1164,7 +1165,9 @@ function drawScene() {
   mat4.identity(v2wMatrix);
   v2wMatrix = mat4.multiply(v2wMatrix, vMatrix);
   v2wMatrix = mat4.inverse(v2wMatrix);
-  drawSkybox();
+  if (show_skybox) {
+    drawSkybox();
+  }
   gl.useProgram(phongshaderProgram);
 
   gl.uniform4f(phongshaderProgram.light_posUniform,light_pos[0], light_pos[1], light_pos[2], light_pos[3]);  
@@ -1180,9 +1183,11 @@ function drawScene() {
   gl.uniform1f(phongshaderProgram.shininess_coefUniform, mat_shine[0]); 
 
   
-  mat4.translate(mMatrix, [1.5, 0, 0]);
-  drawCylinder();
-  mat4.identity(mMatrix);
+  if (control_type === 2 || control_type === 3) {
+    mat4.translate(mMatrix, [1.5, 0, 0]);
+    drawCylinder();
+    mat4.identity(mMatrix);
+  }
 
   if (teapotVertexPositionBuffer == null || teapotVertexNormalBuffer == null || teapotVertexIndexBuffer == null) {
     return;
@@ -1227,7 +1232,13 @@ function drawScene() {
 
   setMatrixUniforms(teapotProgram);   // pass the modelview matrix and projection matrix to the shader
 
-  gl.drawElements(gl.TRIANGLES, teapotVertexIndexBuffer.numItems , gl.UNSIGNED_SHORT, 0);  
+  if (draw_type === 2) {
+    gl.drawElements(gl.TRIANGLES, teapotVertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+  } else if (draw_type === 1) {
+    gl.drawElements(gl.LINES, teapotVertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+  } else {
+    gl.drawArrays(gl.POINTS, 0, teapotVertexPositionBuffer.numItems);
+  }
   
 }
 
@@ -1324,19 +1335,29 @@ function drawCylinder() {
 
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cylinderVertexIndexBuffer);
 
-  gl.drawElements(gl.TRIANGLES, cylinderVertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+  if (draw_type === 2) {
+    gl.drawElements(gl.TRIANGLES, cylinderVertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+  } else if (draw_type === 1) {
+    gl.drawElements(gl.LINES, cylinderVertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+  } else {
+    gl.drawArrays(gl.POINTS, 0, cylinderVertexPositionBuffer.numItems);
+  }
 
   gl.bindBuffer(gl.ARRAY_BUFFER, circleTopVertexPositionBuffer);
   gl.vertexAttribPointer(phongshaderProgram.vertexPositionAttribute, circleTopVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
   gl.bindBuffer(gl.ARRAY_BUFFER, circleTopVertexNormalBuffer);
   gl.vertexAttribPointer(phongshaderProgram.vertexNormalAttribute, circleTopVertexNormalBuffer.itemSize, gl.FLOAT, false, 0, 0);
-  gl.drawArrays(gl.TRIANGLE_FAN, 0, circleTopVertexPositionBuffer.numItems);
+  if (draw_type === 2) gl.drawArrays(gl.TRIANGLE_FAN, 0, circleTopVertexPositionBuffer.numItems);
+  else if (draw_type === 1) gl.drawArrays(gl.LINE_LOOP, 0, circleTopVertexPositionBuffer.numItems);
+  else gl.drawArrays(gl.POINTS, 0, circleTopVertexPositionBuffer.numItems);
 
   gl.bindBuffer(gl.ARRAY_BUFFER, circleBotVertexPositionBuffer);
   gl.vertexAttribPointer(phongshaderProgram.vertexPositionAttribute, circleBotVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
   gl.bindBuffer(gl.ARRAY_BUFFER, circleBotVertexNormalBuffer);
   gl.vertexAttribPointer(phongshaderProgram.vertexNormalAttribute, circleBotVertexNormalBuffer.itemSize, gl.FLOAT, false, 0, 0);
-  gl.drawArrays(gl.TRIANGLE_FAN, 0, circleBotVertexPositionBuffer.numItems);
+  if (draw_type === 2) gl.drawArrays(gl.TRIANGLE_FAN, 0, circleBotVertexPositionBuffer.numItems);
+  else if (draw_type === 1) gl.drawArrays(gl.LINE_LOOP, 0, circleBotVertexPositionBuffer.numItems);
+  else gl.drawArrays(gl.POINTS, 0, circleBotVertexPositionBuffer.numItems);
 }
 
 function drawSkybox() {
@@ -1494,6 +1515,9 @@ var lastMouseX = 0, lastMouseY = 0;
 ///////////////////////////////////////////////////////////////
 
 function onDocumentMouseDown( event ) {
+  if (!event.target || event.target.id !== "code03-canvas") {
+    return;
+  }
   event.preventDefault();
   document.addEventListener( 'mousemove', onDocumentMouseMove, false );
   document.addEventListener( 'mouseup', onDocumentMouseUp, false );
@@ -1804,6 +1828,7 @@ function CenterOfInterest( value ) {
 }
 
 function BG(red, green, blue) {
+    show_skybox = false;
     gl.clearColor(red, green, blue, 1.0);
     drawScene(); 
 } 
@@ -1830,5 +1855,8 @@ function geometry(type) {
 
 function texture(value) {
     use_texture = value;
+    if (value === 2) {
+      show_skybox = true;
+    }
     drawScene();
 } 
