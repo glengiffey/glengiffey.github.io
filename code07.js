@@ -1311,6 +1311,7 @@ function drawSphere() {
 function drawCylinder() {
 
   gl.useProgram(phongshaderProgram);
+  setMatrixUniforms(phongshaderProgram);
 
   gl.bindBuffer(gl.ARRAY_BUFFER, cylinderVertexPositionBuffer);
   gl.vertexAttribPointer(phongshaderProgram.vertexPositionAttribute, cylinderVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
@@ -1320,7 +1321,7 @@ function drawCylinder() {
 
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cylinderVertexIndexBuffer);
 
-  gl.drawArrays(gl.TRIANGLE_STRIP, 0, cylinderVertexPositionBuffer.numItems);
+  gl.drawElements(gl.TRIANGLES, cylinderVertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
 
   gl.bindBuffer(gl.ARRAY_BUFFER, circleTopVertexPositionBuffer);
   gl.vertexAttribPointer(phongshaderProgram.vertexPositionAttribute, circleTopVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
