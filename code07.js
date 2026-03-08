@@ -1516,14 +1516,17 @@ function onDocumentMouseMove( event ) {
   }
   else if(control_type==2) {
     mat4.rotateY(model, degToRad(X_angle));
+    mat4.rotateX(model, degToRad(Z_angle));
   }
   else if(control_type==3) {
     mat4.rotate(modelrarm, degToRad(X_angle), [1, 0, 0]);
     mat4.rotate(modellarm, degToRad(-X_angle), [1, 0, 0]);
-
+    mat4.rotate(modelrarm, degToRad(Z_angle), [0, 1, 0]);
+    mat4.rotate(modellarm, degToRad(-Z_angle), [0, 1, 0]);
   }
   else if(control_type==4) {
     mat4.rotate(rMatrix, degToRad(X_angle), [0,0,1]);
+    mat4.rotate(rMatrix, degToRad(Z_angle), [1,0,0]);
   }
 
   lastMouseX = mouseX;
