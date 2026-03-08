@@ -1106,6 +1106,13 @@ var X_angle = 0.0;
 var Z_angle = 0.0;
 
 function setMatrixUniforms(theshaderProgram) {
+  // Recompute nMatrix from current mMatrix so rotated objects get correct normals
+  mat4.identity(nMatrix);
+  nMatrix = mat4.multiply(nMatrix, vMatrix);
+  nMatrix = mat4.multiply(nMatrix, mMatrix);
+  nMatrix = mat4.inverse(nMatrix);
+  nMatrix = mat4.transpose(nMatrix);
+
   gl.uniformMatrix4fv(theshaderProgram.mMatrixUniform, false, mMatrix);
   gl.uniformMatrix4fv(theshaderProgram.vMatrixUniform, false, vMatrix);
   gl.uniformMatrix4fv(theshaderProgram.pMatrixUniform, false, pMatrix);
@@ -1145,12 +1152,6 @@ function drawScene() {
   vMatrix = mat4.multiply(mat4.lookAt(cameraPos, centerofInterest, viewUp, vMatrix), rMatrix);  // set up the view matrix
 
   mat4.identity(mMatrix);
-
-  mat4.identity(nMatrix);
-  nMatrix = mat4.multiply(nMatrix, vMatrix);
-  nMatrix = mat4.multiply(nMatrix, mMatrix);
-  nMatrix = mat4.inverse(nMatrix);
-  nMatrix = mat4.transpose(nMatrix);
 
   mat4.identity(v2wMatrix);
   v2wMatrix = mat4.multiply(v2wMatrix, vMatrix);
