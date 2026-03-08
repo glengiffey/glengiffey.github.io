@@ -1060,7 +1060,8 @@ function initTextures() {
   sampleTexture = gl.createTexture();
   sampleTexture.image = new Image();
   sampleTexture.image.onload = function() { handleTextureLoaded(sampleTexture); }
-  sampleTexture.image.src = "posx.jpg";
+  sampleTexture.image.onerror = function() { console.warn("brick.png not found; Regular texture mode unavailable"); }
+  sampleTexture.image.src = "brick.png";
   console.log("loading texture....")
 }
 
