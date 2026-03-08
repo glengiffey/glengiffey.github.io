@@ -293,6 +293,7 @@ void main(void) {
     <button onclick="CameraPosition(4)"> Right </button>
     <button onclick="CameraPosition(5)"> Forward </button>
     <button onclick="CameraPosition(6)"> Backward </button>
+    <button onclick="ResetCamera()"> Reset </button>
     </h4>
     <h4> Ambient Intensity (R)
     <input type="range" min="0" max="100" value="12" step="5" onchange="AmbientIntensity(this.value, -1, -1)" />
@@ -316,22 +317,24 @@ void main(void) {
     <input type="range" min="0" max="100" value="55" step="5" onchange="SpecularIntensity( -1, -1, this.value)" />
     </h4>
     
-    <h4> Light: 
+    <h4> Light:
     <button onclick="LightPosition(1)"> Up </button>
     <button onclick="LightPosition(2)"> Down </button>
     <button onclick="LightPosition(3)"> Left </button>
     <button onclick="LightPosition(4)"> Right </button>
     <button onclick="LightPosition(5)"> Forward </button>
     <button onclick="LightPosition(6)"> Backward </button>
+    <button onclick="ResetLight()"> Reset </button>
     </h4>
     
-    <h4> Center Of Interest: 
+    <h4> Center Of Interest:
     <button onclick="CenterOfInterest(1)"> Up </button>
     <button onclick="CenterOfInterest(2)"> Down </button>
     <button onclick="CenterOfInterest(3)"> Left </button>
     <button onclick="CenterOfInterest(4)"> Right </button>
     <button onclick="CenterOfInterest(5)"> Forward </button>
     <button onclick="CenterOfInterest(6)"> Backward </button>
+    <button onclick="ResetCenterOfInterest()"> Reset </button>
     </h4>
 
     <h4> Background:

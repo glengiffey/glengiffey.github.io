@@ -1210,6 +1210,21 @@ function webGLStart() {
   drawScene();
 }
 
+function ResetCamera() {
+  cameraPos = [0, 5, -9];
+  drawScene();
+}
+
+function ResetLight() {
+  light_pos = [0, 5, -9, 1];
+  drawScene();
+}
+
+function ResetCenterOfInterest() {
+  centerofInterest = [0, 0, 0];
+  drawScene();
+}
+
 function CameraPosition( value ) {
   switch(value){
     case 1:
