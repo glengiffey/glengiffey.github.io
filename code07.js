@@ -1549,20 +1549,20 @@ function onKeyDown(event) {
   switch(event.keyCode) {
     case 83:
       console.log('enter s');
-      if(control_type==1) { mat4.scale( mMatrix, [1.05, 1.05, 1.05]); }
+      if(control_type==1) { mat4.scale( rMatrix, [1.05, 1.05, 1.05]); }
       else if(control_type==2) { mat4.scale( model, [1.05, 1.05, 1.05]); }
-      else if(control_type==3) { 
+      else if(control_type==3) {
         mat4.scale( modella, [1.05, 1.05, 1.05]);
         mat4.scale( modelra, [1.05, 1.05, 1.05]);
       }
       break;
     case 68:
       console.log('enter d');
-      if(control_type==1) { mat4.scale( mMatrix, [.95, .95, .95]); }
+      if(control_type==1) { mat4.scale( rMatrix, [.95, .95, .95]); }
       else if(control_type==2) { mat4.scale( model, [.95, .95, .95]); }
-      else if(control_type==3) { 
+      else if(control_type==3) {
         mat4.scale( modella, [.95, .95, .95]);
-        mat4.scale( modelra, [.95, .95, .95]); 
+        mat4.scale( modelra, [.95, .95, .95]);
       }
       break;
   }
