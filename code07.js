@@ -1146,20 +1146,17 @@ function drawScene() {
   gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-  if (teapotVertexPositionBuffer == null || teapotVertexNormalBuffer == null || teapotVertexIndexBuffer == null) {
-    return;
-  }
-  pMatrix = mat4.perspective(60, 1.0, 0.1, 100, pMatrix);  // set up the projection matrix 
+  pMatrix = mat4.perspective(60, 1.0, 0.1, 100, pMatrix);  // set up the projection matrix
 
   vMatrix = mat4.multiply(mat4.lookAt(cameraPos, centerofInterest, viewUp, vMatrix), rMatrix);  // set up the view matrix
-  
-  mat4.identity(mMatrix); 
 
-  mat4.identity(nMatrix); 
+  mat4.identity(mMatrix);
+
+  mat4.identity(nMatrix);
   nMatrix = mat4.multiply(nMatrix, vMatrix);
-  nMatrix = mat4.multiply(nMatrix, mMatrix);  
+  nMatrix = mat4.multiply(nMatrix, mMatrix);
   nMatrix = mat4.inverse(nMatrix);
-  nMatrix = mat4.transpose(nMatrix); 
+  nMatrix = mat4.transpose(nMatrix);
 
   mat4.identity(v2wMatrix);
   v2wMatrix = mat4.multiply(v2wMatrix, vMatrix);
@@ -1183,6 +1180,10 @@ function drawScene() {
   mat4.translate(mMatrix, [1.5, 0, 0]);
   drawCylinder();
   mat4.identity(mMatrix);
+
+  if (teapotVertexPositionBuffer == null || teapotVertexNormalBuffer == null || teapotVertexIndexBuffer == null) {
+    return;
+  }
 
   // Select shader program based on texture mode
   var teapotProgram;
