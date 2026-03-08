@@ -15,7 +15,7 @@ var light_diffuse = [.8,.8,.8,1];
 var light_specular = [1,1,1,1]; 
 var light_pos = [0,5,-9,1];   // eye space position 
 
-var mat_ambient = [0, 0, 0, 1]; 
+var mat_ambient = [1, 1, 1, 1];
 var mat_diffuse= [1, 1, 0, 1]; 
 var mat_specular = [.9, .9, .9,1]; 
 var mat_shine = [50]; 
