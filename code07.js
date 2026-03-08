@@ -1190,29 +1190,44 @@ function drawScene() {
   drawCylinder();
   mat4.identity(mMatrix);
 
-  gl.useProgram(shaderProgram);
+  // Select shader program based on texture mode
+  var teapotProgram;
+  if (use_texture === 2) {
+    teapotProgram = shaderProgram;        // cubemap reflective
+  } else if (use_texture === 1) {
+    teapotProgram = textureshaderProgram; // 2D texture
+  } else {
+    teapotProgram = phongshaderProgram;   // Phong shading (default)
+  }
+  gl.useProgram(teapotProgram);
 
   mMatrix = mat4.scale(mMatrix, [2/10, 2/10, 2/10]);
   gl.bindBuffer(gl.ARRAY_BUFFER, teapotVertexPositionBuffer);
-  gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, teapotVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
+  gl.vertexAttribPointer(teapotProgram.vertexPositionAttribute, teapotVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
   gl.bindBuffer(gl.ARRAY_BUFFER, teapotVertexNormalBuffer);
-  gl.vertexAttribPointer(shaderProgram.vertexNormalAttribute, teapotVertexNormalBuffer.itemSize, gl.FLOAT, false, 0, 0);
+  gl.vertexAttribPointer(teapotProgram.vertexNormalAttribute, teapotVertexNormalBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
   gl.bindBuffer(gl.ARRAY_BUFFER, teapotVertexTextureCoordBuffer);
-  gl.vertexAttribPointer(shaderProgram.vertexTexCoordsAttribute, teapotVertexTextureCoordBuffer.itemSize, gl.FLOAT, false, 0, 0);
+  gl.vertexAttribPointer(teapotProgram.vertexTexCoordsAttribute, teapotVertexTextureCoordBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
-  gl.bindBuffer(gl.ARRAY_BUFFER, teapotVertexColorBuffer);  
-  gl.vertexAttribPointer(shaderProgram.vertexColorAttribute, teapotVertexColorBuffer.itemSize, gl.FLOAT, false, 0, 0);
+  gl.bindBuffer(gl.ARRAY_BUFFER, teapotVertexColorBuffer);
+  gl.vertexAttribPointer(teapotProgram.vertexColorAttribute, teapotVertexColorBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, teapotVertexIndexBuffer);
 
-  // Cube Map Reflection texture
-  gl.activeTexture(gl.TEXTURE1);                          // set texture unit 1 to use 
-  gl.bindTexture(gl.TEXTURE_CUBE_MAP, cubemapTexture);    // bind the texture object to the texture unit 
-  gl.uniform1i(shaderProgram.cube_map_textureUniform, 1);   // pass the texture unit to the shader
+  // Bind appropriate texture for the selected mode
+  if (use_texture === 2) {
+    gl.activeTexture(gl.TEXTURE1);
+    gl.bindTexture(gl.TEXTURE_CUBE_MAP, cubemapTexture);
+    gl.uniform1i(shaderProgram.cube_map_textureUniform, 1);
+  } else if (use_texture === 1) {
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, sampleTexture);
+    gl.uniform1i(textureshaderProgram.textureUniform, 0);
+  }
 
-  setMatrixUniforms(shaderProgram);   // pass the modelview mattrix and projection matrix to the shader
+  setMatrixUniforms(teapotProgram);   // pass the modelview matrix and projection matrix to the shader
 
   gl.drawElements(gl.TRIANGLES, teapotVertexIndexBuffer.numItems , gl.UNSIGNED_SHORT, 0);  
   
