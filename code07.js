@@ -1219,6 +1219,18 @@ function drawScene() {
 
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, teapotVertexIndexBuffer);
 
+  // Keep reflective shader lighting uniforms in sync with sliders.
+  if (teapotProgram === shaderProgram) {
+    gl.uniform4f(shaderProgram.light_posUniform, light_pos[0], light_pos[1], light_pos[2], light_pos[3]);
+    gl.uniform4f(shaderProgram.light_ambientUniform, light_ambient[0], light_ambient[1], light_ambient[2], 1.0);
+    gl.uniform4f(shaderProgram.light_diffuseUniform, light_diffuse[0], light_diffuse[1], light_diffuse[2], 1.0);
+    gl.uniform4f(shaderProgram.light_specularUniform, light_specular[0], light_specular[1], light_specular[2], 1.0);
+    gl.uniform4f(shaderProgram.ambient_coefUniform, mat_ambient[0], mat_ambient[1], mat_ambient[2], 1.0);
+    gl.uniform4f(shaderProgram.diffuse_coefUniform, mat_diffuse[0], mat_diffuse[1], mat_diffuse[2], 1.0);
+    gl.uniform4f(shaderProgram.specular_coefUniform, mat_specular[0], mat_specular[1], mat_specular[2], 1.0);
+    gl.uniform1f(shaderProgram.shininess_coefUniform, mat_shine[0]);
+  }
+
   // Bind appropriate texture for the selected mode
   if (use_texture === 2) {
     gl.activeTexture(gl.TEXTURE1);
@@ -1646,7 +1658,15 @@ function webGLStart() {
   shaderProgram.vMatrixUniform = gl.getUniformLocation(shaderProgram, "uVMatrix");
   shaderProgram.pMatrixUniform = gl.getUniformLocation(shaderProgram, "uPMatrix");
   shaderProgram.nMatrixUniform = gl.getUniformLocation(shaderProgram, "uNMatrix");
-  shaderProgram.v2wMatrixUniform = gl.getUniformLocation(shaderProgram, "uV2WMatrix");   
+  shaderProgram.v2wMatrixUniform = gl.getUniformLocation(shaderProgram, "uV2WMatrix");
+  shaderProgram.light_posUniform = gl.getUniformLocation(shaderProgram, "light_pos");
+  shaderProgram.ambient_coefUniform = gl.getUniformLocation(shaderProgram, "ambient_coef");
+  shaderProgram.diffuse_coefUniform = gl.getUniformLocation(shaderProgram, "diffuse_coef");
+  shaderProgram.specular_coefUniform = gl.getUniformLocation(shaderProgram, "specular_coef");
+  shaderProgram.shininess_coefUniform = gl.getUniformLocation(shaderProgram, "mat_shininess");
+  shaderProgram.light_ambientUniform = gl.getUniformLocation(shaderProgram, "light_ambient");
+  shaderProgram.light_diffuseUniform = gl.getUniformLocation(shaderProgram, "light_diffuse");
+  shaderProgram.light_specularUniform = gl.getUniformLocation(shaderProgram, "light_specular");
 
   phongshaderProgram.mMatrixUniform = gl.getUniformLocation(phongshaderProgram, "uMMatrix");
   phongshaderProgram.vMatrixUniform = gl.getUniformLocation(phongshaderProgram, "uVMatrix");

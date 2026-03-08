@@ -41,15 +41,33 @@
    varying vec4 vColor; 
 
    void main(void) {
+     vec3 view_vector = normalize(-vec3(eye_pos));
+     vec3 normal = normalize(v_normal);
 
-     vec3 view_vector, ref; 
-     vec4 env_color = vec4(1,0,0,1);
+     // Reflection lookup from eye space to world space.
+     vec3 ref = normalize(reflect(-view_vector, normal));
+     ref = vec3(uV2WMatrix * vec4(ref, 0.0));
+     vec4 env_color = textureCube(cubeMap, ref);
 
-          view_vector = normalize(vec3(vec4(0,0,0,1)-eye_pos));
-          ref = normalize(reflect(-view_vector, v_normal));  // in eye space
-          ref = vec3(uV2WMatrix*vec4(ref,0));   // convert to world space
-          env_color = textureCube(cubeMap, ref);
-          gl_FragColor = env_color;
+     // Phong lighting in eye space.
+     vec4 light_pos_in_eye = uVMatrix * light_pos;
+     vec3 light_vector = normalize(vec3(light_pos_in_eye - eye_pos));
+     float ndotl = max(dot(normal, light_vector), 0.0);
+
+     vec4 ambient = ambient_coef * light_ambient;
+     vec4 diffuse = diffuse_coef * light_diffuse * ndotl;
+
+     vec3 R = normalize(reflect(-light_vector, normal));
+     float rdotv = max(dot(R, view_vector), 0.0);
+     vec4 specular = (ndotl > 0.0)
+       ? specular_coef * light_specular * pow(rdotv, mat_shininess)
+       : vec4(0.0, 0.0, 0.0, 1.0);
+
+     vec4 phong_color = ambient + diffuse + specular;
+
+     // Blend base lighting with reflection.
+     float reflectivity = 0.30;
+     gl_FragColor = mix(phong_color, env_color, reflectivity);
 
 }
 </script>
@@ -305,4 +323,3 @@ void main(void) {
 </body>
 
 </html>
-
