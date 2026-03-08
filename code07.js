@@ -173,6 +173,7 @@ var squareVertexPositionBuffer;
 var squareVertexNormalBuffer;
 var squareVertexColorBuffer;
 var squareVertexIndexBuffer;
+var squareVertexTexCoordsBuffer;
 
 var sqvertices = [];
 var sqnormals = []; 
