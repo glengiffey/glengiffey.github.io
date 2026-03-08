@@ -65,9 +65,13 @@
 
      vec4 phong_color = ambient + diffuse + specular;
 
-     // Blend base lighting with reflection.
-     float reflectivity = 0.30;
-     gl_FragColor = mix(phong_color, env_color, reflectivity);
+     // Brushed-brass look: warm base with tempered, tinted reflection.
+     vec3 brass_base = vec3(0.78, 0.62, 0.22);
+     vec3 brass_reflection_tint = vec3(1.00, 0.90, 0.70);
+     vec3 base_rgb = phong_color.rgb * brass_base;
+     vec3 reflected_rgb = env_color.rgb * brass_reflection_tint;
+     float reflectivity = 0.42;
+     gl_FragColor = vec4(mix(base_rgb, reflected_rgb, reflectivity), 1.0);
 
 }
 </script>
@@ -258,25 +262,25 @@ void main(void) {
     <button onclick="CameraPosition(6)"> Backward </button>
     </h4>
     <h4> Ambient Intensity (R)
-    <input type="range" min="0" max="100" value="0" step="5" onchange="AmbientIntensity(this.value, -1, -1)" />
+    <input type="range" min="0" max="100" value="12" step="5" onchange="AmbientIntensity(this.value, -1, -1)" />
      Ambient Intensity (G)
-    <input type="range" min="0" max="100" value="0" step="5" onchange="AmbientIntensity(-1, this.value, -1)" />
+    <input type="range" min="0" max="100" value="12" step="5" onchange="AmbientIntensity(-1, this.value, -1)" />
      Ambient Intensity (B)
-    <input type="range" min="0" max="100" value="0" step="5" onchange="AmbientIntensity(-1, -1, this.value)" />
+    <input type="range" min="0" max="100" value="12" step="5" onchange="AmbientIntensity(-1, -1, this.value)" />
     </h4>
     <h4> Diffuse Intensity (R)
-    <input type="range" min="0" max="100" value="80" step="5" onchange="DiffuseIntensity(this.value, -1, -1)" />
+    <input type="range" min="0" max="100" value="58" step="5" onchange="DiffuseIntensity(this.value, -1, -1)" />
      Diffuse Intensity (G)
-    <input type="range" min="0" max="100" value="80" step="5" onchange="DiffuseIntensity(-1, this.value, -1)" />
+    <input type="range" min="0" max="100" value="58" step="5" onchange="DiffuseIntensity(-1, this.value, -1)" />
      Diffuse Intensity (B)
-    <input type="range" min="0" max="100" value="80" step="5" onchange="DiffuseIntensity(-1, -1, this.value)" />
+    <input type="range" min="0" max="100" value="58" step="5" onchange="DiffuseIntensity(-1, -1, this.value)" />
     </h4>
     <h4> Specular Intensity (R)
-    <input type="range" min="0" max="100" value="100" step="5" onchange="SpecularIntensity(this.value, -1, -1)" />
+    <input type="range" min="0" max="100" value="55" step="5" onchange="SpecularIntensity(this.value, -1, -1)" />
      Specular Intensity (G)
-    <input type="range" min="0" max="100" value="100" step="5" onchange="SpecularIntensity( -1, this.value, -1)" />
+    <input type="range" min="0" max="100" value="55" step="5" onchange="SpecularIntensity( -1, this.value, -1)" />
      Specular Intensity (B)
-    <input type="range" min="0" max="100" value="100" step="5" onchange="SpecularIntensity( -1, -1, this.value)" />
+    <input type="range" min="0" max="100" value="55" step="5" onchange="SpecularIntensity( -1, -1, this.value)" />
     </h4>
     
     <h4> Light: 

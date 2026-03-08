@@ -11,15 +11,15 @@ var use_texture=0;
 var show_skybox = true;
 
 // set up the parameters for lighting 
-var light_ambient = [0,0,0,1]; 
-var light_diffuse = [.8,.8,.8,1];
-var light_specular = [1,1,1,1]; 
+var light_ambient = [.12,.12,.12,1]; 
+var light_diffuse = [.58,.58,.58,1];
+var light_specular = [.55,.55,.55,1]; 
 var light_pos = [0,5,-9,1];   // eye space position 
 
-var mat_ambient = [1, 1, 1, 1];
-var mat_diffuse= [1, 1, 0, 1]; 
-var mat_specular = [.9, .9, .9,1]; 
-var mat_shine = [50]; 
+var mat_ambient = [0.22, 0.16, 0.06, 1];
+var mat_diffuse= [0.78, 0.62, 0.22, 1]; 
+var mat_specular = [0.85, 0.72, 0.35, 1]; 
+var mat_shine = [35]; 
 
 //set up camera and view parrameters
 var cameraPos = [0, 5, -9];
