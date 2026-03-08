@@ -7,7 +7,7 @@ var textureshaderProgram;
 var shaderProgram;
 var draw_type=2; 
 var control_type=1;
-var use_texture=0;
+var use_texture=2;
 var show_skybox = true;
 
 // set up the parameters for lighting 
@@ -1230,6 +1230,16 @@ function drawScene() {
     gl.uniform4f(shaderProgram.specular_coefUniform, mat_specular[0], mat_specular[1], mat_specular[2], 1.0);
     gl.uniform1f(shaderProgram.shininess_coefUniform, mat_shine[0]);
   }
+  if (teapotProgram === textureshaderProgram) {
+    gl.uniform4f(textureshaderProgram.light_posUniform, light_pos[0], light_pos[1], light_pos[2], light_pos[3]);
+    gl.uniform4f(textureshaderProgram.light_ambientUniform, light_ambient[0], light_ambient[1], light_ambient[2], 1.0);
+    gl.uniform4f(textureshaderProgram.light_diffuseUniform, light_diffuse[0], light_diffuse[1], light_diffuse[2], 1.0);
+    gl.uniform4f(textureshaderProgram.light_specularUniform, light_specular[0], light_specular[1], light_specular[2], 1.0);
+    gl.uniform4f(textureshaderProgram.ambient_coefUniform, mat_ambient[0], mat_ambient[1], mat_ambient[2], 1.0);
+    gl.uniform4f(textureshaderProgram.diffuse_coefUniform, mat_diffuse[0], mat_diffuse[1], mat_diffuse[2], 1.0);
+    gl.uniform4f(textureshaderProgram.specular_coefUniform, mat_specular[0], mat_specular[1], mat_specular[2], 1.0);
+    gl.uniform1f(textureshaderProgram.shininess_coefUniform, mat_shine[0]);
+  }
 
   // Bind appropriate texture for the selected mode
   if (use_texture === 2) {
@@ -1374,6 +1384,15 @@ function drawCylinder() {
 
 function drawSkybox() {
   gl.useProgram(textureshaderProgram);
+  // Render skybox as unlit texture even though texture shader supports lighting.
+  gl.uniform4f(textureshaderProgram.light_posUniform, 0.0, 0.0, 0.0, 1.0);
+  gl.uniform4f(textureshaderProgram.light_ambientUniform, 1.0, 1.0, 1.0, 1.0);
+  gl.uniform4f(textureshaderProgram.light_diffuseUniform, 0.0, 0.0, 0.0, 1.0);
+  gl.uniform4f(textureshaderProgram.light_specularUniform, 0.0, 0.0, 0.0, 1.0);
+  gl.uniform4f(textureshaderProgram.ambient_coefUniform, 1.0, 1.0, 1.0, 1.0);
+  gl.uniform4f(textureshaderProgram.diffuse_coefUniform, 0.0, 0.0, 0.0, 1.0);
+  gl.uniform4f(textureshaderProgram.specular_coefUniform, 0.0, 0.0, 0.0, 1.0);
+  gl.uniform1f(textureshaderProgram.shininess_coefUniform, 1.0);
 
   // PX
 
@@ -1679,6 +1698,14 @@ function webGLStart() {
   textureshaderProgram.pMatrixUniform = gl.getUniformLocation(textureshaderProgram, "uPMatrix");
   textureshaderProgram.nMatrixUniform = gl.getUniformLocation(textureshaderProgram, "uNMatrix");
   textureshaderProgram.v2wMatrixUniform = gl.getUniformLocation(textureshaderProgram, "uV2WMatrix");
+  textureshaderProgram.light_posUniform = gl.getUniformLocation(textureshaderProgram, "light_pos");
+  textureshaderProgram.ambient_coefUniform = gl.getUniformLocation(textureshaderProgram, "ambient_coef");
+  textureshaderProgram.diffuse_coefUniform = gl.getUniformLocation(textureshaderProgram, "diffuse_coef");
+  textureshaderProgram.specular_coefUniform = gl.getUniformLocation(textureshaderProgram, "specular_coef");
+  textureshaderProgram.shininess_coefUniform = gl.getUniformLocation(textureshaderProgram, "mat_shininess");
+  textureshaderProgram.light_ambientUniform = gl.getUniformLocation(textureshaderProgram, "light_ambient");
+  textureshaderProgram.light_diffuseUniform = gl.getUniformLocation(textureshaderProgram, "light_diffuse");
+  textureshaderProgram.light_specularUniform = gl.getUniformLocation(textureshaderProgram, "light_specular");
 
   phongshaderProgram.light_posUniform = gl.getUniformLocation(phongshaderProgram, "light_pos");
   phongshaderProgram.ambient_coefUniform = gl.getUniformLocation(phongshaderProgram, "ambient_coef"); 

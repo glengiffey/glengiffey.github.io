@@ -158,15 +158,42 @@ void main(void) {
    uniform mat4 uNMatrix;    // normal matrix 
    uniform mat4 uV2WMatrix;  // eye to world 
 
+   uniform vec4 light_pos;
+   uniform vec4 ambient_coef;
+   uniform vec4 diffuse_coef;
+   uniform vec4 specular_coef;
+   uniform float mat_shininess;
+   uniform vec4 light_ambient;
+   uniform vec4 light_diffuse;
+   uniform vec4 light_specular;
+
    uniform sampler2D myTexture;
 
+   varying vec4 eye_pos;
+   varying vec3 v_normal;
    varying highp vec2 FtexCoord; 
    varying vec4 vColor; 
 
    void main(void) {
-      vec4 texcolor;
-      texcolor = texture2D(myTexture, FtexCoord); 
-      gl_FragColor = texcolor; 
+      vec4 texcolor = texture2D(myTexture, FtexCoord);
+      vec3 normal = normalize(v_normal);
+      vec3 view_vector = normalize(-vec3(eye_pos));
+
+      vec4 light_pos_in_eye = uVMatrix * light_pos;
+      vec3 light_vector = normalize(vec3(light_pos_in_eye - eye_pos));
+      float ndotl = max(dot(normal, light_vector), 0.0);
+
+      vec4 ambient = ambient_coef * light_ambient;
+      vec4 diffuse = diffuse_coef * light_diffuse * ndotl;
+
+      vec3 R = normalize(reflect(-light_vector, normal));
+      float rdotv = max(dot(R, view_vector), 0.0);
+      vec4 specular = (ndotl > 0.0)
+        ? specular_coef * light_specular * pow(rdotv, mat_shininess)
+        : vec4(0.0, 0.0, 0.0, 1.0);
+
+      vec3 lit_tex = texcolor.rgb * (ambient.rgb + diffuse.rgb) + specular.rgb;
+      gl_FragColor = vec4(lit_tex, texcolor.a);
 }
 </script>
 
