@@ -527,8 +527,6 @@ function initCylinderBuffers() {
   }
   // now create the index array 
 
-  var nindices = (nstacks-1)*6*(nslices+1);
-
   for (var j = 0; j < nstacks-1; j++) {
     for (var i = 0; i <= nslices; i++) {
       var mi = i % nslices;
