@@ -833,11 +833,16 @@ function initTeapotJSON() {
   request.onreadystatechange =
     function () {
       if (request.readyState == 4) {
-        if (request.status === 200 || request.status === 0) {
+        if ((request.status === 200 || request.status === 0) && request.responseText) {
           console.log("state ="+request.readyState);
-          handleLoadedTeapot(JSON.parse(request.responseText));
+          try {
+            handleLoadedTeapot(JSON.parse(request.responseText));
+          } catch (e) {
+            console.error("Failed to parse teapot.json:", e);
+          }
         } else {
-          console.error("Failed to load teapot.json:", request.status);
+          console.error("Failed to load teapot.json: status=" + request.status +
+                        ", responseText empty=" + !request.responseText);
         }
       }
     }
