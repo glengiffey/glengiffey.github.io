@@ -508,8 +508,8 @@ function initCylinderBuffers() {
     
   var Dangle = 2*Math.PI/(nslices-1); 
 
-  for (j =0; j<nstacks; j++) {
-    for (i=0; i<nslices; i++) {
+  for (var j = 0; j < nstacks; j++) {
+    for (var i = 0; i < nslices; i++) {
       var idx = j*nslices + i; // mesh[j][i] 
       var angle = Dangle * i; 
 
@@ -529,10 +529,10 @@ function initCylinderBuffers() {
   }
   // now create the index array 
 
-  nindices = (nstacks-1)*6*(nslices+1); 
+  var nindices = (nstacks-1)*6*(nslices+1);
 
-  for (j =0; j<nstacks-1; j++){
-    for (i=0; i<=nslices; i++) {
+  for (var j = 0; j < nstacks-1; j++) {
+    for (var i = 0; i <= nslices; i++) {
       var mi = i % nslices;
       var mi2 = (i+1) % nslices;
       var idx = (j+1) * nslices + mi; 
@@ -948,7 +948,6 @@ function initCubeMap() {
         img[i].onload = function() {
             ct++;
             if (ct == 6) {
-                texID = gl.createTexture();
                 gl.bindTexture(gl.TEXTURE_CUBE_MAP, cubemapTexture);
                 var targets = [
                    gl.TEXTURE_CUBE_MAP_POSITIVE_X, gl.TEXTURE_CUBE_MAP_NEGATIVE_X, 
