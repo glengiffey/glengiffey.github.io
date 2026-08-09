@@ -99,35 +99,27 @@ var skypzTexture;
 var skynzTexture; 
 
 function initSkyBoxTextures() {
-    skypxTexture = gl.createTexture();
-    skypxTexture.image = new Image();
-    skypxTexture.image.onload = function() { handleSkyBoxTextureLoaded(skypxTexture, 2); }
-    skypxTexture.image.src = "posx.jpg";
+    skypxTexture = loadSkyBoxFace("posx.jpg", 2);
+    skynxTexture = loadSkyBoxFace("negx.jpg", 3);
+    skypyTexture = loadSkyBoxFace("posy.jpg", 4);
+    skynyTexture = loadSkyBoxFace("negy.jpg", 5);
+    skypzTexture = loadSkyBoxFace("posz.jpg", 6);
+    skynzTexture = loadSkyBoxFace("negz.jpg", 7);
+}
 
-    skynxTexture = gl.createTexture();
-    skynxTexture.image = new Image();
-    skynxTexture.image.onload = function() { handleSkyBoxTextureLoaded(skynxTexture, 3); }
-    skynxTexture.image.src = "negx.jpg";
-
-    skypyTexture = gl.createTexture();
-    skypyTexture.image = new Image();
-    skypyTexture.image.onload = function() { handleSkyBoxTextureLoaded(skypyTexture, 4); }
-    skypyTexture.image.src = "posy.jpg";
-
-    skynyTexture = gl.createTexture();
-    skynyTexture.image = new Image();
-    skynyTexture.image.onload = function() { handleSkyBoxTextureLoaded(skynyTexture, 5); }
-    skynyTexture.image.src = "negy.jpg";
-
-    skypzTexture = gl.createTexture();
-    skypzTexture.image = new Image();
-    skypzTexture.image.onload = function() { handleSkyBoxTextureLoaded(skypzTexture, 6); }
-    skypzTexture.image.src = "posz.jpg";
-
-    skynzTexture = gl.createTexture();
-    skynzTexture.image = new Image();
-    skynzTexture.image.onload = function() { handleSkyBoxTextureLoaded(skynzTexture, 7); }
-    skynzTexture.image.src = "negz.jpg";
+// Load one skybox face into its own texture unit. A face that never arrives
+// leaves that side of the box untextured, so report it rather than silently
+// rendering a black wall.
+function loadSkyBoxFace(url, unit) {
+    var texture = gl.createTexture();
+    texture.image = new Image();
+    texture.image.onload = function() { handleSkyBoxTextureLoaded(texture, unit); };
+    texture.image.onerror = function() {
+        console.error("Skybox face failed to load: " + url +
+                      " (that side of the background will render black)");
+    };
+    texture.image.src = url;
+    return texture;
 }
 
 function handleSkyBoxTextureLoaded(texture, i) {
@@ -473,6 +465,7 @@ var cubemapTexture;
 function initCubeMap() {
 	cubemapTexture = gl.createTexture();
 	var ct = 0;
+	var failed = 0;
     var img = new Array(6);
     var urls = [
        "posx.jpg", "negx.jpg",
@@ -500,6 +493,15 @@ function initCubeMap() {
 	                drawScene();
 	            }
 	        }
+	        // A face that never arrives leaves ct short of 6, so the cube map is
+	        // never uploaded. Report that instead of silently losing reflections.
+	        img[i].onerror = (function (url) {
+	            return function () {
+	                failed++;
+	                console.error("Cube map face failed to load: " + url + " (" + failed +
+	                              " of 6 faces missing; reflections will not render)");
+	            };
+	        })(urls[i]);
 	        img[i].src = urls[i];
 	    }
 }
