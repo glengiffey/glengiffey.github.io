@@ -16,6 +16,9 @@
      touch-action:none hands drags to the rotation handler instead of letting
      the browser scroll the page with them. */
   #code03-canvas { max-width: 100%; height: auto; touch-action: none; }
+  /* Keep each label with its slider when the row wraps, so a label never ends
+     up sitting above someone else's control. */
+  .slider-field { display: inline-block; white-space: nowrap; margin-right: 1rem; }
 </style>
 
 <script type="text/javascript" src="glMatrix-0.9.5.min.js"></script>
@@ -305,26 +308,20 @@ void main(void) {
     <button onclick="CameraPosition(6)"> Backward </button>
     <button onclick="ResetCamera()"> Reset </button>
     </h4>
-    <h4> Ambient Intensity (R)
-    <input id="ambient-r" type="range" min="0" max="100" value="12" step="1" onchange="AmbientIntensity(this.value, -1, -1)" />
-     Ambient Intensity (G)
-    <input id="ambient-g" type="range" min="0" max="100" value="12" step="1" onchange="AmbientIntensity(-1, this.value, -1)" />
-     Ambient Intensity (B)
-    <input id="ambient-b" type="range" min="0" max="100" value="12" step="1" onchange="AmbientIntensity(-1, -1, this.value)" />
+    <h4>
+    <span class="slider-field"><label for="ambient-r">Ambient Intensity (R)</label> <input id="ambient-r" type="range" min="0" max="100" value="12" step="1" onchange="AmbientIntensity(this.value, -1, -1)" /></span>
+    <span class="slider-field"><label for="ambient-g">Ambient Intensity (G)</label> <input id="ambient-g" type="range" min="0" max="100" value="12" step="1" onchange="AmbientIntensity(-1, this.value, -1)" /></span>
+    <span class="slider-field"><label for="ambient-b">Ambient Intensity (B)</label> <input id="ambient-b" type="range" min="0" max="100" value="12" step="1" onchange="AmbientIntensity(-1, -1, this.value)" /></span>
     </h4>
-    <h4> Diffuse Intensity (R)
-    <input id="diffuse-r" type="range" min="0" max="100" value="58" step="1" onchange="DiffuseIntensity(this.value, -1, -1)" />
-     Diffuse Intensity (G)
-    <input id="diffuse-g" type="range" min="0" max="100" value="58" step="1" onchange="DiffuseIntensity(-1, this.value, -1)" />
-     Diffuse Intensity (B)
-    <input id="diffuse-b" type="range" min="0" max="100" value="58" step="1" onchange="DiffuseIntensity(-1, -1, this.value)" />
+    <h4>
+    <span class="slider-field"><label for="diffuse-r">Diffuse Intensity (R)</label> <input id="diffuse-r" type="range" min="0" max="100" value="58" step="1" onchange="DiffuseIntensity(this.value, -1, -1)" /></span>
+    <span class="slider-field"><label for="diffuse-g">Diffuse Intensity (G)</label> <input id="diffuse-g" type="range" min="0" max="100" value="58" step="1" onchange="DiffuseIntensity(-1, this.value, -1)" /></span>
+    <span class="slider-field"><label for="diffuse-b">Diffuse Intensity (B)</label> <input id="diffuse-b" type="range" min="0" max="100" value="58" step="1" onchange="DiffuseIntensity(-1, -1, this.value)" /></span>
     </h4>
-    <h4> Specular Intensity (R)
-    <input id="specular-r" type="range" min="0" max="100" value="55" step="1" onchange="SpecularIntensity(this.value, -1, -1)" />
-     Specular Intensity (G)
-    <input id="specular-g" type="range" min="0" max="100" value="55" step="1" onchange="SpecularIntensity( -1, this.value, -1)" />
-     Specular Intensity (B)
-    <input id="specular-b" type="range" min="0" max="100" value="55" step="1" onchange="SpecularIntensity( -1, -1, this.value)" />
+    <h4>
+    <span class="slider-field"><label for="specular-r">Specular Intensity (R)</label> <input id="specular-r" type="range" min="0" max="100" value="55" step="1" onchange="SpecularIntensity(this.value, -1, -1)" /></span>
+    <span class="slider-field"><label for="specular-g">Specular Intensity (G)</label> <input id="specular-g" type="range" min="0" max="100" value="55" step="1" onchange="SpecularIntensity( -1, this.value, -1)" /></span>
+    <span class="slider-field"><label for="specular-b">Specular Intensity (B)</label> <input id="specular-b" type="range" min="0" max="100" value="55" step="1" onchange="SpecularIntensity( -1, -1, this.value)" /></span>
     </h4>
     
     <h4> Light:
