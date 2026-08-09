@@ -48,7 +48,18 @@ p.intro {
 	font-weight : bold;
 	font-size   : 14px;
 }
-/* These keep their column alignment, so scroll them rather than wrap them. */
+/* These keep their column alignment, so scroll them rather than wrap them.
+   A shadow marks whichever edge still has content behind it, and clears once
+   you reach that end. The platform scrollbar cannot do this job: it is an
+   overlay that paints nothing until you are already scrolling, so clipped
+   content reads as missing content. The gradients pinned "local" scroll with
+   the text and uncover the "scroll" shadows underneath only when there is
+   something to reach. */
 pre {
   overflow-x: auto;
+  background:
+    linear-gradient(to right, #fff 30%, rgba(255, 255, 255, 0)) left   / 40px 100% no-repeat local,
+    linear-gradient(to left,  #fff 30%, rgba(255, 255, 255, 0)) right  / 40px 100% no-repeat local,
+    radial-gradient(farthest-side at   0 50%, rgba(0, 0, 0, .25), rgba(0, 0, 0, 0)) left  / 14px 100% no-repeat scroll,
+    radial-gradient(farthest-side at 100% 50%, rgba(0, 0, 0, .25), rgba(0, 0, 0, 0)) right / 14px 100% no-repeat scroll;
 }
