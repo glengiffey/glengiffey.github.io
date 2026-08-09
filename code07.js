@@ -5,16 +5,30 @@ var gl;
 var phongshaderProgram;
 var textureshaderProgram;
 var shaderProgram;
-var draw_type=2; 
-var control_type=1;
-var use_texture=2;
+// Scene defaults, shared by the initial state and by the Reset controls so the
+// two cannot drift apart.
+var DEFAULT_DRAW_TYPE = 2;
+var DEFAULT_CONTROL_TYPE = 1;
+var DEFAULT_USE_TEXTURE = 2;
+var DEFAULT_LIGHT_AMBIENT = [.12,.12,.12,1];
+var DEFAULT_LIGHT_DIFFUSE = [.58,.58,.58,1];
+var DEFAULT_LIGHT_SPECULAR = [.55,.55,.55,1];
+var DEFAULT_LIGHT_POS = [0,5,-9,1];
+var DEFAULT_CAMERA_POS = [0,5,-9];
+var DEFAULT_CENTER_OF_INTEREST = [0,0,0];
+var DEFAULT_VIEW_UP = [0,1,0];
+var DEFAULT_CLEAR_COLOR = [0.0,0.0,0.0,1.0];
+
+var draw_type = DEFAULT_DRAW_TYPE;
+var control_type = DEFAULT_CONTROL_TYPE;
+var use_texture = DEFAULT_USE_TEXTURE;
 var show_skybox = true;
 
-// set up the parameters for lighting 
-var light_ambient = [.12,.12,.12,1]; 
-var light_diffuse = [.58,.58,.58,1];
-var light_specular = [.55,.55,.55,1]; 
-var light_pos = [0,5,-9,1];   // eye space position 
+// set up the parameters for lighting
+var light_ambient = DEFAULT_LIGHT_AMBIENT.slice();
+var light_diffuse = DEFAULT_LIGHT_DIFFUSE.slice();
+var light_specular = DEFAULT_LIGHT_SPECULAR.slice();
+var light_pos = DEFAULT_LIGHT_POS.slice();   // eye space position
 
 var mat_ambient = [0.22, 0.16, 0.06, 1];
 var mat_diffuse= [0.78, 0.62, 0.22, 1]; 
@@ -22,9 +36,9 @@ var mat_specular = [0.85, 0.72, 0.35, 1];
 var mat_shine = [35]; 
 
 //set up camera and view parrameters
-var cameraPos = [0, 5, -9];
-var centerofInterest = [0, 0, 0];
-var viewUp = [0, 1, 0];
+var cameraPos = DEFAULT_CAMERA_POS.slice();
+var centerofInterest = DEFAULT_CENTER_OF_INTEREST.slice();
+var viewUp = DEFAULT_VIEW_UP.slice();
 
 //////////// Init OpenGL Context etc. ///////////////
 
@@ -44,18 +58,6 @@ function initGL(canvas) {
 
 ///////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////
-
-var circleTopVertexPositionBuffer;
-var circleBotVertexPositionBuffer;
-var circleTopVertexNormalBuffer;
-var circleBotVertexNormalBuffer;
-var circleVertexColorBuffer;
-var circleVertexIndexBuffer;
-
-var cylinderVertexPositionBuffer;
-var cylinderVertexNormalBuffer;
-var cylinderVertexColorBuffer;
-var cylinderVertexIndexBuffer;
 
 var skyboxpxVertexPositionBuffer;
 var skyboxpxVertexColorBuffer;
@@ -111,35 +113,27 @@ var skypzTexture;
 var skynzTexture; 
 
 function initSkyBoxTextures() {
-    skypxTexture = gl.createTexture();
-    skypxTexture.image = new Image();
-    skypxTexture.image.onload = function() { handleSkyBoxTextureLoaded(skypxTexture, 2); }
-    skypxTexture.image.src = "posx.jpg";
+    skypxTexture = loadSkyBoxFace("posx.jpg", 2);
+    skynxTexture = loadSkyBoxFace("negx.jpg", 3);
+    skypyTexture = loadSkyBoxFace("posy.jpg", 4);
+    skynyTexture = loadSkyBoxFace("negy.jpg", 5);
+    skypzTexture = loadSkyBoxFace("posz.jpg", 6);
+    skynzTexture = loadSkyBoxFace("negz.jpg", 7);
+}
 
-    skynxTexture = gl.createTexture();
-    skynxTexture.image = new Image();
-    skynxTexture.image.onload = function() { handleSkyBoxTextureLoaded(skynxTexture, 3); }
-    skynxTexture.image.src = "negx.jpg";
-
-    skypyTexture = gl.createTexture();
-    skypyTexture.image = new Image();
-    skypyTexture.image.onload = function() { handleSkyBoxTextureLoaded(skypyTexture, 4); }
-    skypyTexture.image.src = "posy.jpg";
-
-    skynyTexture = gl.createTexture();
-    skynyTexture.image = new Image();
-    skynyTexture.image.onload = function() { handleSkyBoxTextureLoaded(skynyTexture, 5); }
-    skynyTexture.image.src = "negy.jpg";
-
-    skypzTexture = gl.createTexture();
-    skypzTexture.image = new Image();
-    skypzTexture.image.onload = function() { handleSkyBoxTextureLoaded(skypzTexture, 6); }
-    skypzTexture.image.src = "posz.jpg";
-
-    skynzTexture = gl.createTexture();
-    skynzTexture.image = new Image();
-    skynzTexture.image.onload = function() { handleSkyBoxTextureLoaded(skynzTexture, 7); }
-    skynzTexture.image.src = "negz.jpg";
+// Load one skybox face into its own texture unit. A face that never arrives
+// leaves that side of the box untextured, so report it rather than silently
+// rendering a black wall.
+function loadSkyBoxFace(url, unit) {
+    var texture = gl.createTexture();
+    texture.image = new Image();
+    texture.image.onload = function() { handleSkyBoxTextureLoaded(texture, unit); };
+    texture.image.onerror = function() {
+        console.error("Skybox face failed to load: " + url +
+                      " (that side of the background will render black)");
+    };
+    texture.image.src = url;
+    return texture;
 }
 
 function handleSkyBoxTextureLoaded(texture, i) {
@@ -155,147 +149,6 @@ function handleSkyBoxTextureLoaded(texture, i) {
 }
 
 /////////////////////////////////////////////////////////////////////////////
-
-
-
-function initCircleBuffers() {
-  var tcirverts = [];
-  var bcirverts = [];
-  var tcirnormals = [];
-  var bcirnormals = [];
-  var nslices = 50;
-
-  var Dangle= 2*Math.PI/(nslices-1);
-  for(var i=0; i<nslices; i++){
-    var angle = Dangle * i;
-  
-    tcirverts.push(Math.cos(angle)/2); 
-    tcirverts.push(Math.sin(angle)/2); 
-    tcirverts.push(1.0/(50-1)-1.75);
-
-    tcirnormals.push(0.0); 
-    tcirnormals.push(0.0);
-    tcirnormals.push(-1.0);
-
-    bcirverts.push(Math.cos(angle)/2); 
-    bcirverts.push(Math.sin(angle)/2); 
-    bcirverts.push(49*3.0/(50-1)-1.75);
-
-    bcirnormals.push(0.0); 
-    bcirnormals.push(0.0);
-    bcirnormals.push(1.0);    
-  }
-  circleTopVertexPositionBuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, circleTopVertexPositionBuffer);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(tcirverts), gl.STATIC_DRAW);
-  circleTopVertexPositionBuffer.itemSize = 3;
-  circleTopVertexPositionBuffer.numItems = nslices;
-
-  circleBotVertexPositionBuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, circleBotVertexPositionBuffer);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(bcirverts), gl.STATIC_DRAW);
-  circleBotVertexPositionBuffer.itemSize = 3;
-  circleBotVertexPositionBuffer.numItems = nslices;
-
-  circleBotVertexNormalBuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, circleBotVertexNormalBuffer);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(bcirnormals), gl.STATIC_DRAW);
-  circleBotVertexNormalBuffer.itemSize = 3;
-  circleBotVertexNormalBuffer.numItems = nslices;
-
-  circleTopVertexNormalBuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, circleTopVertexNormalBuffer);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(tcirnormals), gl.STATIC_DRAW);
-  circleTopVertexNormalBuffer.itemSize = 3;
-  circleTopVertexNormalBuffer.numItems = nslices;
-
-  circleVertexColorBuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, circleVertexColorBuffer);
-  var colors = [];
-  for(var j = 0; j<nslices+2; j++){
-    colors.push(0.0, 0.5, 0.0, 1.0);
-  }
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
-  circleVertexColorBuffer.itemSize = 4;
-  circleVertexColorBuffer.numItems = nslices;
-}
-
-function initCylinderBuffers() {
-  var cyverts = [];
-  var cynormals = []; 
-  var cycolors = []; 
-  var cyIndices = [];
-
-  var nslices = 50;
-  var nstacks = 25;
-
-  var Dangle = 2*Math.PI/(nslices-1); 
-
-  for (var j = 0; j < nstacks; j++) {
-    for (var i = 0; i < nslices; i++) {
-      var idx = j*nslices + i; // mesh[j][i] 
-      var angle = Dangle * i; 
-
-      cyverts.push(Math.cos(angle)/2); 
-      cyverts.push(Math.sin(angle)/2); 
-      cyverts.push(j*3.0/(nstacks-1)-1.75);
-
-      cynormals.push(Math.cos(angle));
-      cynormals.push(0.0);
-      cynormals.push(Math.sin(angle));
-      
-      cycolors.push(Math.cos(angle)); 
-      cycolors.push(Math.sin(angle)); 
-      cycolors.push(j*1.0/(nstacks-1)); 
-      cycolors.push(1.0); 
-    }
-  }
-  // now create the index array 
-
-  for (var j = 0; j < nstacks-1; j++) {
-    for (var i = 0; i <= nslices; i++) {
-      var mi = i % nslices;
-      var mi2 = (i+1) % nslices;
-      var idx = (j+1) * nslices + mi; 
-      var idx2 = j*nslices + mi; // mesh[j][mi] 
-      var idx3 = (j) * nslices + mi2;
-      var idx4 = (j+1) * nslices + mi;
-      var idx5 = (j) * nslices + mi2;
-      var idx6 = (j+1) * nslices + mi2;
-  
-      cyIndices.push(idx); 
-      cyIndices.push(idx2);
-      cyIndices.push(idx3); 
-      cyIndices.push(idx4);
-      cyIndices.push(idx5); 
-      cyIndices.push(idx6);
-    }
-  }
-  
-  cylinderVertexPositionBuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, cylinderVertexPositionBuffer);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(cyverts), gl.STATIC_DRAW);
-  cylinderVertexPositionBuffer.itemSize = 3;
-  cylinderVertexPositionBuffer.numItems = nslices * nstacks;
-
-  cylinderVertexNormalBuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, cylinderVertexNormalBuffer);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(cynormals), gl.STATIC_DRAW);
-  cylinderVertexNormalBuffer.itemSize = 3;
-  cylinderVertexNormalBuffer.numItems = nslices * nstacks;
-
-  cylinderVertexIndexBuffer = gl.createBuffer();  
-  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cylinderVertexIndexBuffer); 
-  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(cyIndices), gl.STATIC_DRAW);  
-  cylinderVertexIndexBuffer.itemSize = 1;
-  cylinderVertexIndexBuffer.numItems = (nstacks-1)*6*(nslices+1);
-
-  cylinderVertexColorBuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, cylinderVertexColorBuffer);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(cycolors), gl.STATIC_DRAW);
-  cylinderVertexColorBuffer.itemSize = 4;
-  cylinderVertexColorBuffer.numItems = nslices * nstacks;
-}
 
 function initSkybox(){
   // Keep skybox comfortably away from scene objects but inside far clip plane.
@@ -626,6 +479,7 @@ var cubemapTexture;
 function initCubeMap() {
 	cubemapTexture = gl.createTexture();
 	var ct = 0;
+	var failed = 0;
     var img = new Array(6);
     var urls = [
        "posx.jpg", "negx.jpg",
@@ -653,6 +507,15 @@ function initCubeMap() {
 	                drawScene();
 	            }
 	        }
+	        // A face that never arrives leaves ct short of 6, so the cube map is
+	        // never uploaded. Report that instead of silently losing reflections.
+	        img[i].onerror = (function (url) {
+	            return function () {
+	                failed++;
+	                console.error("Cube map face failed to load: " + url + " (" + failed +
+	                              " of 6 faces missing; reflections will not render)");
+	            };
+	        })(urls[i]);
 	        img[i].src = urls[i];
 	    }
 }
@@ -742,12 +605,6 @@ function drawScene() {
 
   gl.uniform1f(phongshaderProgram.shininess_coefUniform, mat_shine[0]); 
 
-  
-  if (control_type === 2) {
-    mat4.translate(mMatrix, [1.5, 0, 0]);
-    drawCylinder();
-    mat4.identity(mMatrix);
-  }
 
   if (teapotVertexPositionBuffer == null || teapotVertexNormalBuffer == null || teapotVertexIndexBuffer == null) {
     return;
@@ -823,44 +680,6 @@ function drawScene() {
     gl.drawArrays(gl.POINTS, 0, teapotVertexPositionBuffer.numItems);
   }
   
-}
-
-function drawCylinder() {
-
-  gl.useProgram(phongshaderProgram);
-  setMatrixUniforms(phongshaderProgram);
-
-  gl.bindBuffer(gl.ARRAY_BUFFER, cylinderVertexPositionBuffer);
-  gl.vertexAttribPointer(phongshaderProgram.vertexPositionAttribute, cylinderVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
-
-  gl.bindBuffer(gl.ARRAY_BUFFER, cylinderVertexNormalBuffer);
-  gl.vertexAttribPointer(phongshaderProgram.vertexNormalAttribute, cylinderVertexNormalBuffer.itemSize, gl.FLOAT, false, 0, 0);
-
-  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cylinderVertexIndexBuffer);
-
-  if (draw_type === 2) {
-    gl.drawElements(gl.TRIANGLES, cylinderVertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
-  } else if (draw_type === 1) {
-    gl.drawElements(gl.LINES, cylinderVertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
-  } else {
-    gl.drawArrays(gl.POINTS, 0, cylinderVertexPositionBuffer.numItems);
-  }
-
-  gl.bindBuffer(gl.ARRAY_BUFFER, circleTopVertexPositionBuffer);
-  gl.vertexAttribPointer(phongshaderProgram.vertexPositionAttribute, circleTopVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
-  gl.bindBuffer(gl.ARRAY_BUFFER, circleTopVertexNormalBuffer);
-  gl.vertexAttribPointer(phongshaderProgram.vertexNormalAttribute, circleTopVertexNormalBuffer.itemSize, gl.FLOAT, false, 0, 0);
-  if (draw_type === 2) gl.drawArrays(gl.TRIANGLE_FAN, 0, circleTopVertexPositionBuffer.numItems);
-  else if (draw_type === 1) gl.drawArrays(gl.LINE_LOOP, 0, circleTopVertexPositionBuffer.numItems);
-  else gl.drawArrays(gl.POINTS, 0, circleTopVertexPositionBuffer.numItems);
-
-  gl.bindBuffer(gl.ARRAY_BUFFER, circleBotVertexPositionBuffer);
-  gl.vertexAttribPointer(phongshaderProgram.vertexPositionAttribute, circleBotVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
-  gl.bindBuffer(gl.ARRAY_BUFFER, circleBotVertexNormalBuffer);
-  gl.vertexAttribPointer(phongshaderProgram.vertexNormalAttribute, circleBotVertexNormalBuffer.itemSize, gl.FLOAT, false, 0, 0);
-  if (draw_type === 2) gl.drawArrays(gl.TRIANGLE_FAN, 0, circleBotVertexPositionBuffer.numItems);
-  else if (draw_type === 1) gl.drawArrays(gl.LINE_LOOP, 0, circleBotVertexPositionBuffer.numItems);
-  else gl.drawArrays(gl.POINTS, 0, circleBotVertexPositionBuffer.numItems);
 }
 
 function drawSkybox() {
@@ -1041,12 +860,11 @@ function onDocumentMouseDown( event ) {
   lastMouseY = mouseY; 
 }
 
-function onDocumentMouseMove( event ) {
-  var mouseX = event.clientX;
-  var mouseY = event.clientY;
-
-  var diffX = mouseX - lastMouseX;
-  var diffY = mouseY - lastMouseY;
+// Shared by the mouse and touch paths: rotate by the movement since the last
+// position reported by whichever pointer is dragging.
+function dragTo( x, y ) {
+  var diffX = x - lastMouseX;
+  var diffY = y - lastMouseY;
 
   X_angle = diffX/5;
   Z_angle = diffY/5;
@@ -1064,10 +882,14 @@ function onDocumentMouseMove( event ) {
     mat4.rotate(rMatrix, degToRad(Z_angle), [1,0,0]);
   }
 
-  lastMouseX = mouseX;
-  lastMouseY = mouseY;
+  lastMouseX = x;
+  lastMouseY = y;
 
   drawScene();
+}
+
+function onDocumentMouseMove( event ) {
+  dragTo(event.clientX, event.clientY);
 }
 
 function onDocumentMouseUp( event ) {
@@ -1080,6 +902,38 @@ function onDocumentMouseOut( event ) {
   document.removeEventListener( 'mousemove', onDocumentMouseMove, false );
   document.removeEventListener( 'mouseup', onDocumentMouseUp, false );
   document.removeEventListener( 'mouseout', onDocumentMouseOut, false );
+}
+
+// Touch drag, so the demo is operable on a phone. Single finger only: a second
+// finger means the user is pinching, which we leave to the browser.
+function onDocumentTouchStart( event ) {
+  if (!event.target || event.target.id !== "code03-canvas") {
+    return;
+  }
+  if (event.touches.length !== 1) {
+    return;
+  }
+  event.preventDefault();
+  document.addEventListener( 'touchmove', onDocumentTouchMove, { passive: false } );
+  document.addEventListener( 'touchend', onDocumentTouchEnd, false );
+  document.addEventListener( 'touchcancel', onDocumentTouchEnd, false );
+
+  lastMouseX = event.touches[0].clientX;
+  lastMouseY = event.touches[0].clientY;
+}
+
+function onDocumentTouchMove( event ) {
+  if (event.touches.length !== 1) {
+    return;
+  }
+  event.preventDefault();
+  dragTo(event.touches[0].clientX, event.touches[0].clientY);
+}
+
+function onDocumentTouchEnd( event ) {
+  document.removeEventListener( 'touchmove', onDocumentTouchMove, { passive: false } );
+  document.removeEventListener( 'touchend', onDocumentTouchEnd, false );
+  document.removeEventListener( 'touchcancel', onDocumentTouchEnd, false );
 }
 
 function onKeyDown(event) {
@@ -1186,8 +1040,6 @@ function webGLStart() {
   
   initModels();
 
-  initCircleBuffers();
-  initCylinderBuffers();
   initSkybox();
   initSkyBoxTextures();
 
@@ -1198,13 +1050,14 @@ function webGLStart() {
   mat4.identity(mMatrix); 
   mat4.identity(rMatrix);
 
-  gl.clearColor(0.0, 0.0, 0.0, 1.0);
+  resetClearColor();
 
   document.addEventListener('mousedown', onDocumentMouseDown, false); 
+  document.addEventListener('touchstart', onDocumentTouchStart, { passive: false });
   document.addEventListener('keydown', onKeyDown, false);
 
-  centerofInterest = [0, 0, 0];
-  viewUp = [0, 1, 0];
+  centerofInterest = DEFAULT_CENTER_OF_INTEREST.slice();
+  viewUp = DEFAULT_VIEW_UP.slice();
   X_angle = 0;
   Z_angle = 0;
 
@@ -1212,18 +1065,36 @@ function webGLStart() {
 }
 
 function ResetCamera() {
-  cameraPos = [0, 5, -9];
+  cameraPos = DEFAULT_CAMERA_POS.slice();
   drawScene();
 }
 
 function ResetLight() {
-  light_pos = [0, 5, -9, 1];
+  light_pos = DEFAULT_LIGHT_POS.slice();
   drawScene();
 }
 
 function ResetCenterOfInterest() {
-  centerofInterest = [0, 0, 0];
+  centerofInterest = DEFAULT_CENTER_OF_INTEREST.slice();
   drawScene();
+}
+
+function resetClearColor() {
+  gl.clearColor(DEFAULT_CLEAR_COLOR[0], DEFAULT_CLEAR_COLOR[1],
+                DEFAULT_CLEAR_COLOR[2], DEFAULT_CLEAR_COLOR[3]);
+}
+
+// Push the current light intensities back into the sliders, so the UI cannot
+// keep showing stale positions after the scene is reset.
+function syncIntensitySliders() {
+  var groups = [['ambient', light_ambient], ['diffuse', light_diffuse], ['specular', light_specular]];
+  var channels = ['r', 'g', 'b'];
+  for (var i = 0; i < groups.length; i++) {
+    for (var c = 0; c < channels.length; c++) {
+      var slider = document.getElementById(groups[i][0] + '-' + channels[c]);
+      if (slider) { slider.value = Math.round(groups[i][1][c] * 100); }
+    }
+  }
 }
 
 function CameraPosition( value ) {
@@ -1332,23 +1203,30 @@ function BG(red, green, blue) {
 
 function BGSkybox() {
     show_skybox = true;
-    gl.clearColor(0.0, 0.0, 0.0, 1.0);
+    resetClearColor();
     drawScene();
 } 
 
 function redraw() {
-  cameraPos = [0, 5, -9];
-  centerofInterest = [0, 0, 0];
-  viewUp = [0, 1, 0];
+  cameraPos = DEFAULT_CAMERA_POS.slice();
+  centerofInterest = DEFAULT_CENTER_OF_INTEREST.slice();
+  viewUp = DEFAULT_VIEW_UP.slice();
+  light_pos = DEFAULT_LIGHT_POS.slice();
+  light_ambient = DEFAULT_LIGHT_AMBIENT.slice();
+  light_diffuse = DEFAULT_LIGHT_DIFFUSE.slice();
+  light_specular = DEFAULT_LIGHT_SPECULAR.slice();
   X_angle = 0;
   Z_angle = 0;
-  use_texture = 2;
+  draw_type = DEFAULT_DRAW_TYPE;
+  use_texture = DEFAULT_USE_TEXTURE;
+  control_type = DEFAULT_CONTROL_TYPE;
   show_skybox = true;
+  resetClearColor();
 
   mat4.identity(rMatrix);
 
   initModels();
-  control_type = 1;
+  syncIntensitySliders();
   drawScene();
 }
 
@@ -1360,6 +1238,5 @@ function geometry(type) {
 
 function texture(value) {
     use_texture = value;
-    show_skybox = true;
     drawScene();
-} 
+}
