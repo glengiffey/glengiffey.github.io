@@ -860,12 +860,11 @@ function onDocumentMouseDown( event ) {
   lastMouseY = mouseY; 
 }
 
-function onDocumentMouseMove( event ) {
-  var mouseX = event.clientX;
-  var mouseY = event.clientY;
-
-  var diffX = mouseX - lastMouseX;
-  var diffY = mouseY - lastMouseY;
+// Shared by the mouse and touch paths: rotate by the movement since the last
+// position reported by whichever pointer is dragging.
+function dragTo( x, y ) {
+  var diffX = x - lastMouseX;
+  var diffY = y - lastMouseY;
 
   X_angle = diffX/5;
   Z_angle = diffY/5;
@@ -883,10 +882,14 @@ function onDocumentMouseMove( event ) {
     mat4.rotate(rMatrix, degToRad(Z_angle), [1,0,0]);
   }
 
-  lastMouseX = mouseX;
-  lastMouseY = mouseY;
+  lastMouseX = x;
+  lastMouseY = y;
 
   drawScene();
+}
+
+function onDocumentMouseMove( event ) {
+  dragTo(event.clientX, event.clientY);
 }
 
 function onDocumentMouseUp( event ) {
@@ -899,6 +902,38 @@ function onDocumentMouseOut( event ) {
   document.removeEventListener( 'mousemove', onDocumentMouseMove, false );
   document.removeEventListener( 'mouseup', onDocumentMouseUp, false );
   document.removeEventListener( 'mouseout', onDocumentMouseOut, false );
+}
+
+// Touch drag, so the demo is operable on a phone. Single finger only: a second
+// finger means the user is pinching, which we leave to the browser.
+function onDocumentTouchStart( event ) {
+  if (!event.target || event.target.id !== "code03-canvas") {
+    return;
+  }
+  if (event.touches.length !== 1) {
+    return;
+  }
+  event.preventDefault();
+  document.addEventListener( 'touchmove', onDocumentTouchMove, { passive: false } );
+  document.addEventListener( 'touchend', onDocumentTouchEnd, false );
+  document.addEventListener( 'touchcancel', onDocumentTouchEnd, false );
+
+  lastMouseX = event.touches[0].clientX;
+  lastMouseY = event.touches[0].clientY;
+}
+
+function onDocumentTouchMove( event ) {
+  if (event.touches.length !== 1) {
+    return;
+  }
+  event.preventDefault();
+  dragTo(event.touches[0].clientX, event.touches[0].clientY);
+}
+
+function onDocumentTouchEnd( event ) {
+  document.removeEventListener( 'touchmove', onDocumentTouchMove, { passive: false } );
+  document.removeEventListener( 'touchend', onDocumentTouchEnd, false );
+  document.removeEventListener( 'touchcancel', onDocumentTouchEnd, false );
 }
 
 function onKeyDown(event) {
@@ -1018,6 +1053,7 @@ function webGLStart() {
   resetClearColor();
 
   document.addEventListener('mousedown', onDocumentMouseDown, false); 
+  document.addEventListener('touchstart', onDocumentTouchStart, { passive: false });
   document.addEventListener('keydown', onKeyDown, false);
 
   centerofInterest = DEFAULT_CENTER_OF_INTEREST.slice();

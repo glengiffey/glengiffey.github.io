@@ -12,8 +12,10 @@
 <style>
   body { margin: 1rem; }
   /* The drawing buffer stays 700x700; only its displayed size shrinks, so the
-     canvas never pushes the controls off the side of a phone screen. */
-  #code03-canvas { max-width: 100%; height: auto; }
+     canvas never pushes the controls off the side of a phone screen.
+     touch-action:none hands drags to the rotation handler instead of letting
+     the browser scroll the page with them. */
+  #code03-canvas { max-width: 100%; height: auto; touch-action: none; }
 </style>
 
 <script type="text/javascript" src="glMatrix-0.9.5.min.js"></script>
@@ -279,7 +281,7 @@ void main(void) {
     
     <div>
     <h4>
-    Click on the left mouse button and move the cursor to rotate
+    Drag on the image to rotate, with the mouse or a finger
     </h4>
     </div>
 
