@@ -2,29 +2,40 @@ body {
   margin: 1rem;
 }
 
-/* Photo beside the text on a wide screen, stacked once there is no room. */
-.layout {
-  display    : flex;
-  flex-wrap  : wrap;
-  gap        : 2rem;
-  align-items: flex-start;
-}
-/* Shrinkable, so a narrow screen scales the photo down instead of widening
-   the page past the viewport. */
-.profile {
-  flex     : 0 1 400px;
-  min-width: 0;
-}
+/* Stacked by default. The photo caps at 400px but scales down rather than
+   pushing the page wider than the viewport. */
 .profile img {
   width     : 100%;
   max-width : 400px;
   height    : auto;
 }
-/* min-width:0 lets the <pre> blocks below shrink instead of forcing the
-   whole page wider than the viewport. */
+/* Cap the measure so the prose stays readable on a wide monitor. Wide enough
+   that the <pre> blocks below, the widest of which is about 564px, still fit
+   without scrolling. */
 .content {
-  flex     : 1 1 320px;
-  min-width: 0;
+  max-width: 46rem;
+}
+
+/* Two columns only once the text column still clears the widest <pre>, which
+   measures about 564px, beside the 400px photo and the 2rem gap. Letting
+   flex-wrap pick the breakpoint instead gave the photo its full width first
+   and collapsed the text to 336px between 800 and 1039px, clipping content at
+   widths where a single column had rendered it in full. */
+@media (min-width: 1100px) {
+  .layout {
+    display    : flex;
+    gap        : 2rem;
+    align-items: flex-start;
+  }
+  .profile {
+    flex: 0 0 400px;
+  }
+  /* min-width:0 lets the <pre> blocks shrink inside the flex item instead of
+     forcing the whole page wider than the viewport. */
+  .content {
+    flex     : 1 1 auto;
+    min-width: 0;
+  }
 }
 
 h2 {
