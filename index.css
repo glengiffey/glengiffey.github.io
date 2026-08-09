@@ -1,20 +1,43 @@
 body {
-  /* background-image: url("background.jpg"); */
-  background-position: center;
-  background-repeat  : no-repeat;
-  background-size    : cover; 
+  margin: 1rem;
 }
+
+/* Photo beside the text on a wide screen, stacked once there is no room. */
+.layout {
+  display    : flex;
+  flex-wrap  : wrap;
+  gap        : 2rem;
+  align-items: flex-start;
+}
+/* Shrinkable, so a narrow screen scales the photo down instead of widening
+   the page past the viewport. */
+.profile {
+  flex     : 0 1 400px;
+  min-width: 0;
+}
+.profile img {
+  width     : 100%;
+  max-width : 400px;
+  height    : auto;
+}
+/* min-width:0 lets the <pre> blocks below shrink instead of forcing the
+   whole page wider than the viewport. */
+.content {
+  flex     : 1 1 320px;
+  min-width: 0;
+}
+
 h2 {
 	font-family : monospace;
 	font-weight : bold;
 	font-size   : 20px;
-	white-space : pre;
-	tab-size    : 4
 }
 p.intro {
 	font-family : monospace;
 	font-weight : bold;
 	font-size   : 14px;
-	white-space : pre;
-	tab-size    : 4
+}
+/* These keep their column alignment, so scroll them rather than wrap them. */
+pre {
+  overflow-x: auto;
 }
