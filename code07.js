@@ -1195,6 +1195,5 @@ function geometry(type) {
 
 function texture(value) {
     use_texture = value;
-    show_skybox = true;
     drawScene();
-} 
+}
