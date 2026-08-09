@@ -17,6 +17,7 @@ var DEFAULT_LIGHT_POS = [0,5,-9,1];
 var DEFAULT_CAMERA_POS = [0,5,-9];
 var DEFAULT_CENTER_OF_INTEREST = [0,0,0];
 var DEFAULT_VIEW_UP = [0,1,0];
+var DEFAULT_CLEAR_COLOR = [0.0,0.0,0.0,1.0];
 
 var draw_type = DEFAULT_DRAW_TYPE;
 var control_type = DEFAULT_CONTROL_TYPE;
@@ -1014,13 +1015,13 @@ function webGLStart() {
   mat4.identity(mMatrix); 
   mat4.identity(rMatrix);
 
-  gl.clearColor(0.0, 0.0, 0.0, 1.0);
+  resetClearColor();
 
   document.addEventListener('mousedown', onDocumentMouseDown, false); 
   document.addEventListener('keydown', onKeyDown, false);
 
-  centerofInterest = [0, 0, 0];
-  viewUp = [0, 1, 0];
+  centerofInterest = DEFAULT_CENTER_OF_INTEREST.slice();
+  viewUp = DEFAULT_VIEW_UP.slice();
   X_angle = 0;
   Z_angle = 0;
 
@@ -1040,6 +1041,11 @@ function ResetLight() {
 function ResetCenterOfInterest() {
   centerofInterest = DEFAULT_CENTER_OF_INTEREST.slice();
   drawScene();
+}
+
+function resetClearColor() {
+  gl.clearColor(DEFAULT_CLEAR_COLOR[0], DEFAULT_CLEAR_COLOR[1],
+                DEFAULT_CLEAR_COLOR[2], DEFAULT_CLEAR_COLOR[3]);
 }
 
 // Push the current light intensities back into the sliders, so the UI cannot
@@ -1161,7 +1167,7 @@ function BG(red, green, blue) {
 
 function BGSkybox() {
     show_skybox = true;
-    gl.clearColor(0.0, 0.0, 0.0, 1.0);
+    resetClearColor();
     drawScene();
 } 
 
@@ -1179,6 +1185,7 @@ function redraw() {
   use_texture = DEFAULT_USE_TEXTURE;
   control_type = DEFAULT_CONTROL_TYPE;
   show_skybox = true;
+  resetClearColor();
 
   mat4.identity(rMatrix);
 
