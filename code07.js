@@ -45,18 +45,6 @@ function initGL(canvas) {
 ///////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////
 
-var circleTopVertexPositionBuffer;
-var circleBotVertexPositionBuffer;
-var circleTopVertexNormalBuffer;
-var circleBotVertexNormalBuffer;
-var circleVertexColorBuffer;
-var circleVertexIndexBuffer;
-
-var cylinderVertexPositionBuffer;
-var cylinderVertexNormalBuffer;
-var cylinderVertexColorBuffer;
-var cylinderVertexIndexBuffer;
-
 var skyboxpxVertexPositionBuffer;
 var skyboxpxVertexColorBuffer;
 var skyboxpxVertexTextureCoordBuffer;
@@ -155,147 +143,6 @@ function handleSkyBoxTextureLoaded(texture, i) {
 }
 
 /////////////////////////////////////////////////////////////////////////////
-
-
-
-function initCircleBuffers() {
-  var tcirverts = [];
-  var bcirverts = [];
-  var tcirnormals = [];
-  var bcirnormals = [];
-  var nslices = 50;
-
-  var Dangle= 2*Math.PI/(nslices-1);
-  for(var i=0; i<nslices; i++){
-    var angle = Dangle * i;
-  
-    tcirverts.push(Math.cos(angle)/2); 
-    tcirverts.push(Math.sin(angle)/2); 
-    tcirverts.push(1.0/(50-1)-1.75);
-
-    tcirnormals.push(0.0); 
-    tcirnormals.push(0.0);
-    tcirnormals.push(-1.0);
-
-    bcirverts.push(Math.cos(angle)/2); 
-    bcirverts.push(Math.sin(angle)/2); 
-    bcirverts.push(49*3.0/(50-1)-1.75);
-
-    bcirnormals.push(0.0); 
-    bcirnormals.push(0.0);
-    bcirnormals.push(1.0);    
-  }
-  circleTopVertexPositionBuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, circleTopVertexPositionBuffer);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(tcirverts), gl.STATIC_DRAW);
-  circleTopVertexPositionBuffer.itemSize = 3;
-  circleTopVertexPositionBuffer.numItems = nslices;
-
-  circleBotVertexPositionBuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, circleBotVertexPositionBuffer);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(bcirverts), gl.STATIC_DRAW);
-  circleBotVertexPositionBuffer.itemSize = 3;
-  circleBotVertexPositionBuffer.numItems = nslices;
-
-  circleBotVertexNormalBuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, circleBotVertexNormalBuffer);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(bcirnormals), gl.STATIC_DRAW);
-  circleBotVertexNormalBuffer.itemSize = 3;
-  circleBotVertexNormalBuffer.numItems = nslices;
-
-  circleTopVertexNormalBuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, circleTopVertexNormalBuffer);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(tcirnormals), gl.STATIC_DRAW);
-  circleTopVertexNormalBuffer.itemSize = 3;
-  circleTopVertexNormalBuffer.numItems = nslices;
-
-  circleVertexColorBuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, circleVertexColorBuffer);
-  var colors = [];
-  for(var j = 0; j<nslices+2; j++){
-    colors.push(0.0, 0.5, 0.0, 1.0);
-  }
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
-  circleVertexColorBuffer.itemSize = 4;
-  circleVertexColorBuffer.numItems = nslices;
-}
-
-function initCylinderBuffers() {
-  var cyverts = [];
-  var cynormals = []; 
-  var cycolors = []; 
-  var cyIndices = [];
-
-  var nslices = 50;
-  var nstacks = 25;
-
-  var Dangle = 2*Math.PI/(nslices-1); 
-
-  for (var j = 0; j < nstacks; j++) {
-    for (var i = 0; i < nslices; i++) {
-      var idx = j*nslices + i; // mesh[j][i] 
-      var angle = Dangle * i; 
-
-      cyverts.push(Math.cos(angle)/2); 
-      cyverts.push(Math.sin(angle)/2); 
-      cyverts.push(j*3.0/(nstacks-1)-1.75);
-
-      cynormals.push(Math.cos(angle));
-      cynormals.push(0.0);
-      cynormals.push(Math.sin(angle));
-      
-      cycolors.push(Math.cos(angle)); 
-      cycolors.push(Math.sin(angle)); 
-      cycolors.push(j*1.0/(nstacks-1)); 
-      cycolors.push(1.0); 
-    }
-  }
-  // now create the index array 
-
-  for (var j = 0; j < nstacks-1; j++) {
-    for (var i = 0; i <= nslices; i++) {
-      var mi = i % nslices;
-      var mi2 = (i+1) % nslices;
-      var idx = (j+1) * nslices + mi; 
-      var idx2 = j*nslices + mi; // mesh[j][mi] 
-      var idx3 = (j) * nslices + mi2;
-      var idx4 = (j+1) * nslices + mi;
-      var idx5 = (j) * nslices + mi2;
-      var idx6 = (j+1) * nslices + mi2;
-  
-      cyIndices.push(idx); 
-      cyIndices.push(idx2);
-      cyIndices.push(idx3); 
-      cyIndices.push(idx4);
-      cyIndices.push(idx5); 
-      cyIndices.push(idx6);
-    }
-  }
-  
-  cylinderVertexPositionBuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, cylinderVertexPositionBuffer);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(cyverts), gl.STATIC_DRAW);
-  cylinderVertexPositionBuffer.itemSize = 3;
-  cylinderVertexPositionBuffer.numItems = nslices * nstacks;
-
-  cylinderVertexNormalBuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, cylinderVertexNormalBuffer);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(cynormals), gl.STATIC_DRAW);
-  cylinderVertexNormalBuffer.itemSize = 3;
-  cylinderVertexNormalBuffer.numItems = nslices * nstacks;
-
-  cylinderVertexIndexBuffer = gl.createBuffer();  
-  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cylinderVertexIndexBuffer); 
-  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(cyIndices), gl.STATIC_DRAW);  
-  cylinderVertexIndexBuffer.itemSize = 1;
-  cylinderVertexIndexBuffer.numItems = (nstacks-1)*6*(nslices+1);
-
-  cylinderVertexColorBuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, cylinderVertexColorBuffer);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(cycolors), gl.STATIC_DRAW);
-  cylinderVertexColorBuffer.itemSize = 4;
-  cylinderVertexColorBuffer.numItems = nslices * nstacks;
-}
 
 function initSkybox(){
   // Keep skybox comfortably away from scene objects but inside far clip plane.
@@ -742,12 +589,6 @@ function drawScene() {
 
   gl.uniform1f(phongshaderProgram.shininess_coefUniform, mat_shine[0]); 
 
-  
-  if (control_type === 2) {
-    mat4.translate(mMatrix, [1.5, 0, 0]);
-    drawCylinder();
-    mat4.identity(mMatrix);
-  }
 
   if (teapotVertexPositionBuffer == null || teapotVertexNormalBuffer == null || teapotVertexIndexBuffer == null) {
     return;
@@ -823,44 +664,6 @@ function drawScene() {
     gl.drawArrays(gl.POINTS, 0, teapotVertexPositionBuffer.numItems);
   }
   
-}
-
-function drawCylinder() {
-
-  gl.useProgram(phongshaderProgram);
-  setMatrixUniforms(phongshaderProgram);
-
-  gl.bindBuffer(gl.ARRAY_BUFFER, cylinderVertexPositionBuffer);
-  gl.vertexAttribPointer(phongshaderProgram.vertexPositionAttribute, cylinderVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
-
-  gl.bindBuffer(gl.ARRAY_BUFFER, cylinderVertexNormalBuffer);
-  gl.vertexAttribPointer(phongshaderProgram.vertexNormalAttribute, cylinderVertexNormalBuffer.itemSize, gl.FLOAT, false, 0, 0);
-
-  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cylinderVertexIndexBuffer);
-
-  if (draw_type === 2) {
-    gl.drawElements(gl.TRIANGLES, cylinderVertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
-  } else if (draw_type === 1) {
-    gl.drawElements(gl.LINES, cylinderVertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
-  } else {
-    gl.drawArrays(gl.POINTS, 0, cylinderVertexPositionBuffer.numItems);
-  }
-
-  gl.bindBuffer(gl.ARRAY_BUFFER, circleTopVertexPositionBuffer);
-  gl.vertexAttribPointer(phongshaderProgram.vertexPositionAttribute, circleTopVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
-  gl.bindBuffer(gl.ARRAY_BUFFER, circleTopVertexNormalBuffer);
-  gl.vertexAttribPointer(phongshaderProgram.vertexNormalAttribute, circleTopVertexNormalBuffer.itemSize, gl.FLOAT, false, 0, 0);
-  if (draw_type === 2) gl.drawArrays(gl.TRIANGLE_FAN, 0, circleTopVertexPositionBuffer.numItems);
-  else if (draw_type === 1) gl.drawArrays(gl.LINE_LOOP, 0, circleTopVertexPositionBuffer.numItems);
-  else gl.drawArrays(gl.POINTS, 0, circleTopVertexPositionBuffer.numItems);
-
-  gl.bindBuffer(gl.ARRAY_BUFFER, circleBotVertexPositionBuffer);
-  gl.vertexAttribPointer(phongshaderProgram.vertexPositionAttribute, circleBotVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
-  gl.bindBuffer(gl.ARRAY_BUFFER, circleBotVertexNormalBuffer);
-  gl.vertexAttribPointer(phongshaderProgram.vertexNormalAttribute, circleBotVertexNormalBuffer.itemSize, gl.FLOAT, false, 0, 0);
-  if (draw_type === 2) gl.drawArrays(gl.TRIANGLE_FAN, 0, circleBotVertexPositionBuffer.numItems);
-  else if (draw_type === 1) gl.drawArrays(gl.LINE_LOOP, 0, circleBotVertexPositionBuffer.numItems);
-  else gl.drawArrays(gl.POINTS, 0, circleBotVertexPositionBuffer.numItems);
 }
 
 function drawSkybox() {
@@ -1186,8 +989,6 @@ function webGLStart() {
   
   initModels();
 
-  initCircleBuffers();
-  initCylinderBuffers();
   initSkybox();
   initSkyBoxTextures();
 
