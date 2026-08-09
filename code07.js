@@ -5,16 +5,29 @@ var gl;
 var phongshaderProgram;
 var textureshaderProgram;
 var shaderProgram;
-var draw_type=2; 
-var control_type=1;
-var use_texture=2;
+// Scene defaults, shared by the initial state and by the Reset controls so the
+// two cannot drift apart.
+var DEFAULT_DRAW_TYPE = 2;
+var DEFAULT_CONTROL_TYPE = 1;
+var DEFAULT_USE_TEXTURE = 2;
+var DEFAULT_LIGHT_AMBIENT = [.12,.12,.12,1];
+var DEFAULT_LIGHT_DIFFUSE = [.58,.58,.58,1];
+var DEFAULT_LIGHT_SPECULAR = [.55,.55,.55,1];
+var DEFAULT_LIGHT_POS = [0,5,-9,1];
+var DEFAULT_CAMERA_POS = [0,5,-9];
+var DEFAULT_CENTER_OF_INTEREST = [0,0,0];
+var DEFAULT_VIEW_UP = [0,1,0];
+
+var draw_type = DEFAULT_DRAW_TYPE;
+var control_type = DEFAULT_CONTROL_TYPE;
+var use_texture = DEFAULT_USE_TEXTURE;
 var show_skybox = true;
 
-// set up the parameters for lighting 
-var light_ambient = [.12,.12,.12,1]; 
-var light_diffuse = [.58,.58,.58,1];
-var light_specular = [.55,.55,.55,1]; 
-var light_pos = [0,5,-9,1];   // eye space position 
+// set up the parameters for lighting
+var light_ambient = DEFAULT_LIGHT_AMBIENT.slice();
+var light_diffuse = DEFAULT_LIGHT_DIFFUSE.slice();
+var light_specular = DEFAULT_LIGHT_SPECULAR.slice();
+var light_pos = DEFAULT_LIGHT_POS.slice();   // eye space position
 
 var mat_ambient = [0.22, 0.16, 0.06, 1];
 var mat_diffuse= [0.78, 0.62, 0.22, 1]; 
@@ -22,9 +35,9 @@ var mat_specular = [0.85, 0.72, 0.35, 1];
 var mat_shine = [35]; 
 
 //set up camera and view parrameters
-var cameraPos = [0, 5, -9];
-var centerofInterest = [0, 0, 0];
-var viewUp = [0, 1, 0];
+var cameraPos = DEFAULT_CAMERA_POS.slice();
+var centerofInterest = DEFAULT_CENTER_OF_INTEREST.slice();
+var viewUp = DEFAULT_VIEW_UP.slice();
 
 //////////// Init OpenGL Context etc. ///////////////
 
@@ -1015,18 +1028,31 @@ function webGLStart() {
 }
 
 function ResetCamera() {
-  cameraPos = [0, 5, -9];
+  cameraPos = DEFAULT_CAMERA_POS.slice();
   drawScene();
 }
 
 function ResetLight() {
-  light_pos = [0, 5, -9, 1];
+  light_pos = DEFAULT_LIGHT_POS.slice();
   drawScene();
 }
 
 function ResetCenterOfInterest() {
-  centerofInterest = [0, 0, 0];
+  centerofInterest = DEFAULT_CENTER_OF_INTEREST.slice();
   drawScene();
+}
+
+// Push the current light intensities back into the sliders, so the UI cannot
+// keep showing stale positions after the scene is reset.
+function syncIntensitySliders() {
+  var groups = [['ambient', light_ambient], ['diffuse', light_diffuse], ['specular', light_specular]];
+  var channels = ['r', 'g', 'b'];
+  for (var i = 0; i < groups.length; i++) {
+    for (var c = 0; c < channels.length; c++) {
+      var slider = document.getElementById(groups[i][0] + '-' + channels[c]);
+      if (slider) { slider.value = Math.round(groups[i][1][c] * 100); }
+    }
+  }
 }
 
 function CameraPosition( value ) {
@@ -1140,18 +1166,24 @@ function BGSkybox() {
 } 
 
 function redraw() {
-  cameraPos = [0, 5, -9];
-  centerofInterest = [0, 0, 0];
-  viewUp = [0, 1, 0];
+  cameraPos = DEFAULT_CAMERA_POS.slice();
+  centerofInterest = DEFAULT_CENTER_OF_INTEREST.slice();
+  viewUp = DEFAULT_VIEW_UP.slice();
+  light_pos = DEFAULT_LIGHT_POS.slice();
+  light_ambient = DEFAULT_LIGHT_AMBIENT.slice();
+  light_diffuse = DEFAULT_LIGHT_DIFFUSE.slice();
+  light_specular = DEFAULT_LIGHT_SPECULAR.slice();
   X_angle = 0;
   Z_angle = 0;
-  use_texture = 2;
+  draw_type = DEFAULT_DRAW_TYPE;
+  use_texture = DEFAULT_USE_TEXTURE;
+  control_type = DEFAULT_CONTROL_TYPE;
   show_skybox = true;
 
   mat4.identity(rMatrix);
 
   initModels();
-  control_type = 1;
+  syncIntensitySliders();
   drawScene();
 }
 
