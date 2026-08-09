@@ -10,13 +10,16 @@ Open reflective-teapot.html from a web server (see README.md).
 
 MOUSE AND KEYBOARD
 
-  Left click and drag on the canvas   Rotate, according to the current
-                                      Selection mode below.
+  Drag on the canvas                  Rotate, according to the current
+  (mouse or one finger)               Selection mode below. Horizontal
+                                      movement and vertical movement rotate
+                                      about different axes; see Selection.
   's'                                 Scale up.
   'd'                                 Scale down.
 
 Dragging only rotates when the drag starts on the canvas itself, so the
-controls underneath stay usable.
+controls underneath stay usable. Scaling is keyboard only, so it is not
+available on a touch device.
 
 
 TEXTURE
@@ -26,13 +29,16 @@ TEXTURE
   Cubemap   Reflects the surrounding environment. This is the default.
 
 
-SELECTION (what the mouse rotates)
+SELECTION (what a drag rotates)
 
-  Environment   Rotates the scene around the Y axis. The camera does not
-                move; the space is rotated in front of it. This is the
-                default.
+  Environment   Horizontal drag rotates the scene about Y, vertical about X.
+                The camera does not move; the space is rotated in front of
+                it. This is the default.
   Object        Rotates the teapot only, leaving the environment fixed.
-  Roll Camera   Switches the drag to rotation about the camera's Z axis.
+                Horizontal drag rotates about Y, vertical about X.
+  Roll Camera   Horizontal drag rolls about the camera's Z axis, vertical
+                still rotates about X. Scaling with 's' and 'd' has no
+                effect in this mode.
 
 
 CAMERA / LIGHT / CENTER OF INTEREST

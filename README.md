@@ -5,10 +5,10 @@ Personal site for Glen Giffey, served by GitHub Pages at
 
 ## Contents
 
-- `index.html`, `index.css` - landing page: background, skills, experience,
-  education and links.
+- `index.html`, `index.css` - landing page: about, skills, experience,
+  education and links. `image/profile.jpg` is the photo.
 - `reflective-teapot.html` - an interactive WebGL demo: a brass teapot that
-  reflects a cube-mapped environment. See `README.txt` for the controls.
+  reflects a cube-mapped environment. `README.txt` documents its controls.
 - `code07.js` - scene setup, geometry, textures and the interaction handlers
   for the teapot demo.
 - `shaders_setup.js` - shader compilation and program linking.
