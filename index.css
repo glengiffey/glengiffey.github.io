@@ -15,10 +15,12 @@
   --muted       : #5b6472;
   --accent      : #2f5fd0;
   --accent-soft : rgba(47, 95, 208, .09);
-  /* IonQ brand orange. The real value, #ff5000, only clears 3.12:1 on this
-     background, so light mode uses the same hue and saturation dropped to 38%
-     lightness, which clears 5.04:1. Dark mode gets the brand value itself. */
-  --ionq        : #c23d00;
+  /* IonQ brand orange. The real value, #ff5000, only clears 3.12:1 here, short
+     of the 4.5:1 this text size needs, so light mode keeps the brand hue and
+     saturation and drops lightness to 40%. That is the lightest step that
+     still clears AA against the page background it actually sits on, at
+     4.64:1. Dark mode gets the brand value itself. */
+  --ionq        : #cc4000;
   --border      : #dde2ea;
   --shadow      : rgba(0, 0, 0, .22);
   /* Graph-paper rule. Low enough to read as texture rather than as content:
