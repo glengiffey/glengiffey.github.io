@@ -1,26 +1,85 @@
+/* Tokens. Every colour on the site resolves through one of these, so the dark
+   block below only has to redeclare values, never rules. Off-white and
+   near-black rather than #fff and #000: at full-page scale the pure values are
+   harsh, and the near-black keeps a little blue in it to sit with the photo. */
+:root {
+  color-scheme: light dark;
+
+  --bg          : #f8f9fb;
+  --surface     : #eef1f6;
+  /* Same colour at zero alpha. The fade gradients below interpolate to this
+     rather than to `transparent`, which some engines resolve as transparent
+     black and fringe grey. The original stylesheet took the same care. */
+  --surface-fade: rgba(238, 241, 246, 0);
+  --fg          : #1a1d23;
+  --muted       : #5b6472;
+  --accent      : #2f5fd0;
+  --border      : #dde2ea;
+  --shadow      : rgba(0, 0, 0, .22);
+
+  /* Bare `monospace` resolves to Courier on some systems and Consolas or
+     DejaVu on others, with metrics different enough to break the column
+     measurements the comments below depend on. Pin the stack. */
+  --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
+          "Liberation Mono", monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg          : #14161a;
+    --surface     : #1c1f26;
+    --surface-fade: rgba(28, 31, 38, 0);
+    --fg          : #e4e7ec;
+    --muted       : #9aa3b2;
+    --accent      : #7aa2f7;
+    --border      : #2a2f38;
+    /* Carries more alpha than the light theme: a shadow this dark reads as a
+       shallower step against a dark surface, so it needs the extra weight to
+       stay perceptible. */
+    --shadow      : rgba(0, 0, 0, .55);
+  }
+}
+
 body {
-  margin: 1rem;
+  margin     : 0;
+  padding    : 2.5rem 1.25rem;
+  background : var(--bg);
+  color      : var(--fg);
+  font-family: var(--mono);
+  font-size  : 0.9375rem;
+  line-height: 1.65;
+}
+
+/* Cap and centre the whole thing: 400px photo + 2rem gap + the 46rem text
+   column is 73rem, so past that the layout would drift left of centre on a
+   wide monitor rather than growing. */
+.layout {
+  max-width: 73rem;
+  margin   : 0 auto;
 }
 
 /* Stacked by default. The photo caps at 400px but scales down rather than
    pushing the page wider than the viewport. */
 .profile img {
-  width     : 100%;
-  max-width : 400px;
-  height    : auto;
+  width        : 100%;
+  max-width    : 400px;
+  height       : auto;
+  border       : 1px solid var(--border);
+  border-radius: 8px;
 }
 /* Cap the measure so the prose stays readable on a wide monitor. Wide enough
-   that the <pre> blocks below, the widest of which is about 564px, still fit
-   without scrolling. */
+   that the <pre> blocks below, the widest of which is about 564px of text plus
+   2rem of padding and its border, still fit without scrolling. */
 .content {
   max-width: 46rem;
 }
 
 /* Two columns only once the text column still clears the widest <pre>, which
-   measures about 564px, beside the 400px photo and the 2rem gap. Letting
-   flex-wrap pick the breakpoint instead gave the photo its full width first
-   and collapsed the text to 336px between 800 and 1039px, clipping content at
-   widths where a single column had rendered it in full. */
+   now measures about 598px including its padding and border, beside the 400px
+   photo and the 2rem gap. At this breakpoint the text column gets 628px, so it
+   still clears. Letting flex-wrap pick the breakpoint instead gave the photo
+   its full width first and collapsed the text to 336px between 800 and 1039px,
+   clipping content at widths where a single column had rendered it in full. */
 @media (min-width: 1100px) {
   .layout {
     display    : flex;
@@ -38,60 +97,109 @@ body {
   }
 }
 
+h1 {
+  font-size    : 1.5rem;
+  line-height  : 1.2;
+  margin-bottom: 0.25rem;
+}
+/* The job title under the name is supporting text, not a heading in its own
+   right, so it drops to the muted tone and loses the bold. */
+.profile h4 {
+  margin-top : 0;
+  font-weight: normal;
+  font-size  : 0.9375rem;
+  color      : var(--muted);
+}
+
+/* h2 and h3 previously fell through to the browser default, which put a serif
+   heading on an otherwise monospace page. The rule below the h2 gives the page
+   its section rhythm without adding ornament. */
 h2 {
-	font-family : monospace;
-	font-weight : bold;
-	font-size   : 20px;
+  font-size     : 1.35rem;
+  padding-bottom: 0.4rem;
+  border-bottom : 1px solid var(--border);
 }
+h3 {
+  font-size    : 1.05rem;
+  margin-top   : 2rem;
+  color        : var(--accent);
+}
+h4 {
+  font-size: 0.95rem;
+}
+
+a {
+  color                  : var(--accent);
+  text-underline-offset  : 0.2em;
+  text-decoration-thickness: 1px;
+}
+a:hover {
+  text-decoration-thickness: 2px;
+}
+
 p.intro {
-	font-family : monospace;
-	font-weight : bold;
-	font-size   : 14px;
+  font-size: 0.9375rem;
 }
+
 /* These keep their column alignment, so scroll them rather than wrap them.
    A shadow marks whichever edge still has content behind it, and clears once
    you reach that end. The platform scrollbar cannot do this job: it is an
    overlay that paints nothing until you are already scrolling, so clipped
    content reads as missing content. The gradients pinned "local" scroll with
    the text and uncover the "scroll" shadows underneath only when there is
-   something to reach. */
+   something to reach.
+
+   The fades must match the block's own surface, not the page background, or
+   they paint a panel-coloured smear over the tinted block. The flat colour is
+   last in the shorthand, which is where the background shorthand takes it. */
 pre {
-  overflow-x: auto;
+  overflow-x   : auto;
+  padding      : 0.9rem 1rem;
+  border       : 1px solid var(--border);
+  border-radius: 6px;
+  font-family  : var(--mono);
+  font-size    : 0.875rem;
   background:
-    linear-gradient(to right, #fff 30%, rgba(255, 255, 255, 0)) left   / 40px 100% no-repeat local,
-    linear-gradient(to left,  #fff 30%, rgba(255, 255, 255, 0)) right  / 40px 100% no-repeat local,
-    radial-gradient(farthest-side at   0 50%, rgba(0, 0, 0, .25), rgba(0, 0, 0, 0)) left  / 14px 100% no-repeat scroll,
-    radial-gradient(farthest-side at 100% 50%, rgba(0, 0, 0, .25), rgba(0, 0, 0, 0)) right / 14px 100% no-repeat scroll;
+    linear-gradient(to right, var(--surface) 30%, var(--surface-fade)) left  / 40px 100% no-repeat local,
+    linear-gradient(to left,  var(--surface) 30%, var(--surface-fade)) right / 40px 100% no-repeat local,
+    radial-gradient(farthest-side at   0 50%, var(--shadow), rgba(0, 0, 0, 0)) left  / 14px 100% no-repeat scroll,
+    radial-gradient(farthest-side at 100% 50%, var(--shadow), rgba(0, 0, 0, 0)) right / 14px 100% no-repeat scroll,
+    var(--surface);
 }
 
-/* projects.html carries far longer prose than the landing page, so the bold
-   p.intro treatment would be heavy spread across a whole page. Same monospace
-   family, normal weight, more line height. font-weight is deliberately absent
-   here so the two p.intro leads on that page keep their bold. */
+/* projects.html is a single column with no photo beside it, so centre the
+   measure inside the wider layout cap rather than leaving it pinned left. */
+.projects {
+  margin-inline: auto;
+}
 .projects p {
-  font-family: monospace;
-  font-size  : 14px;
-  line-height: 1.5;
+  font-size  : 0.9rem;
+  line-height: 1.7;
 }
 .projects h4 {
-  font-family  : monospace;
-  font-size    : 15px;
   margin-bottom: 0.25rem;
 }
 /* The description belongs to the heading above it, so close that gap. */
 .projects h4 + p {
   margin-top: 0;
 }
-.projects .backlink {
-  font-size: 13px;
+.backlink {
+  font-size: 0.8125rem;
 }
 /* Figures scale down rather than pushing the page wider than the viewport.
    Both link through to the full-resolution file, which is where the detail
-   actually is. .wide marks a figure that is illegible at the narrower cap. */
+   actually is. .wide marks a figure that is illegible at the narrower cap.
+   The plate keeps a white-background diagram from floating unbounded on a
+   tinted page, and stops it glaring in dark mode. */
 .projects img.figure {
-  width    : 100%;
-  height   : auto;
-  max-width: 560px;
+  width        : 100%;
+  height       : auto;
+  max-width    : 560px;
+  border       : 1px solid var(--border);
+  border-radius: 6px;
+  background   : #fff;
+  padding      : 0.5rem;
+  box-sizing   : border-box;
 }
 .projects img.figure.wide {
   max-width: 100%;
