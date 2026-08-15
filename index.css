@@ -10,7 +10,6 @@
   /* Same colour at zero alpha. The fade gradients below interpolate to this
      rather than to `transparent`, which some engines resolve as transparent
      black and fringe grey. The original stylesheet took the same care. */
-  --surface-fade: rgba(238, 241, 246, 0);
   --fg          : #1a1d23;
   --muted       : #5b6472;
   --accent      : #2f5fd0;
@@ -21,7 +20,6 @@
      at a size that qualifies. Same value in both themes. */
   --ionq        : #ff5000;
   --border      : #dde2ea;
-  --shadow      : rgba(0, 0, 0, .22);
   /* Graph-paper rule. Low enough to read as texture rather than as content:
      it should be findable if you look for it and invisible if you do not. */
   --grid        : rgba(26, 29, 35, .045);
@@ -37,16 +35,11 @@
   :root {
     --bg          : #101317;
     --surface     : #191d24;
-    --surface-fade: rgba(25, 29, 36, 0);
     --fg          : #e4e7ec;
     --muted       : #939cab;
     --accent      : #7aa2f7;
     --accent-soft : rgba(122, 162, 247, .12);
     --border      : #272d37;
-    /* Carries more alpha than the light theme: a shadow this dark reads as a
-       shallower step against a dark surface, so it needs the extra weight to
-       stay perceptible. */
-    --shadow      : rgba(0, 0, 0, .55);
     --grid        : rgba(228, 231, 236, .04);
   }
 }
@@ -273,31 +266,6 @@ p.intro {
   background  : var(--accent-soft);
 }
 
-/* Kept for any page that still needs a real code block. These keep their
-   column alignment, so scroll them rather than wrap them. A shadow marks
-   whichever edge still has content behind it, and clears once you reach that
-   end. The platform scrollbar cannot do this job: it is an overlay that paints
-   nothing until you are already scrolling, so clipped content reads as missing
-   content. The gradients pinned "local" scroll with the text and uncover the
-   "scroll" shadows underneath only when there is something to reach.
-
-   The fades must match the block's own surface, not the page background, or
-   they paint a panel-coloured smear over the tinted block. The flat colour is
-   last in the shorthand, which is where the background shorthand takes it. */
-pre {
-  overflow-x   : auto;
-  padding      : 0.9rem 1rem;
-  border       : 1px solid var(--border);
-  border-radius: 6px;
-  font-family  : var(--mono);
-  font-size    : 0.875rem;
-  background:
-    linear-gradient(to right, var(--surface) 30%, var(--surface-fade)) left  / 40px 100% no-repeat local,
-    linear-gradient(to left,  var(--surface) 30%, var(--surface-fade)) right / 40px 100% no-repeat local,
-    radial-gradient(farthest-side at   0 50%, var(--shadow), rgba(0, 0, 0, 0)) left  / 14px 100% no-repeat scroll,
-    radial-gradient(farthest-side at 100% 50%, var(--shadow), rgba(0, 0, 0, 0)) right / 14px 100% no-repeat scroll,
-    var(--surface);
-}
 
 /* projects.html is a single column with no photo beside it, so centre the
    measure inside the wider layout cap rather than leaving it pinned left. */
@@ -394,4 +362,62 @@ pre {
 }
 .projects img.figure.wide {
   max-width: 100%;
+}
+
+/* This page is a resume, so it will get printed. Everything that only makes
+   sense on a screen comes off: the graph-paper grid, the tinted panels, the
+   sticky column, the navigation. Colours go to black on white whatever theme
+   the reader was viewing, because a dark page prints muddy and drinks ink.
+   Overriding the tokens rather than the rules means every component follows
+   without being named. */
+@media print {
+  :root {
+    --bg         : #fff;
+    --surface    : #fff;
+    --fg         : #000;
+    --muted      : #333;
+    --accent     : #000;
+    --accent-soft: transparent;
+    --border     : #999;
+    --ionq       : #000;
+  }
+  body {
+    padding         : 0;
+    font-size       : 10.5pt;
+    line-height     : 1.45;
+    background-image: none;
+  }
+  .layout  { display: block; max-width: none; }
+  .content { max-width: none; }
+  /* Sticky positioning would pin the column to one printed page. */
+  .profile { position: static; }
+  /* The photo is ink-expensive and a printed resume rarely wants one, and the
+     back link leads nowhere on paper. */
+  .profile img,
+  .backlink { display: none; }
+  /* A printed link is worth nothing unless you can read where it points. */
+  /* The email link already reads as its own address, so it needs no
+     expansion; CSS cannot strip the mailto: prefix anyway. */
+  .content a[href^="http"]::after,
+  .links a[href^="http"]::after {
+    content   : " (" attr(href) ")";
+    font-size : 9pt;
+    word-break: break-all;
+  }
+  /* Chrome that reads as structure on screen is just boxes on paper. */
+  .cards a,
+  .links a,
+  .chips li {
+    background   : none;
+    border       : 0;
+    border-radius: 0;
+    padding      : 0;
+  }
+  .chips    { gap: 0 0.6rem; }
+  .chips li::after            { content: " \00b7"; }
+  .chips li:last-child::after { content: ""; }
+  /* Never split a role from its dates, or strand a heading at a page foot. */
+  h1, h2, h3 { break-after: avoid; page-break-after: avoid; }
+  .timeline li,
+  .cards li  { break-inside: avoid; page-break-inside: avoid; }
 }
