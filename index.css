@@ -14,11 +14,12 @@
   --muted       : #5b6472;
   --accent      : #2f5fd0;
   --accent-soft : rgba(47, 95, 208, .09);
-  /* IonQ's own brand orange, taken from the SVG fill on ionq.com. It reaches
-     3.12:1 on this background, short of the 4.5:1 that normal-size text
-     needs but clear of the 3:1 that large text needs, so .org below is set
-     at a size that qualifies. Same value in both themes. */
-  --ionq        : #ff5000;
+  /* IonQ's brand orange, taken from the SVG fill on ionq.com. The real value,
+     #ff5000, reaches only 3.12:1 here, and inline in the title line this run
+     is no longer large enough to fall under the 3:1 large-text threshold, so
+     light mode keeps the brand hue and saturation at 40% lightness, which
+     clears 4.64:1. Dark mode uses the brand value itself: 5.68:1 at any size. */
+  --ionq        : #cc4000;
   --border      : #dde2ea;
   /* Graph-paper rule. Low enough to read as texture rather than as content:
      it should be findable if you look for it and invisible if you do not. */
@@ -39,6 +40,7 @@
     --muted       : #939cab;
     --accent      : #7aa2f7;
     --accent-soft : rgba(122, 162, 247, .12);
+    --ionq        : #ff5000;
     --border      : #272d37;
     --grid        : rgba(228, 231, 236, .04);
   }
@@ -114,15 +116,12 @@ h1 {
   margin : 0;
   color  : var(--muted);
 }
+/* Sits inline at the end of the title line now. That costs the large-text
+   exemption the standalone version had, so the light theme goes back to a
+   darkened brand hue; see the --ionq token above. */
 .org {
-  margin     : 0.35rem 0 0;
+  color      : var(--ionq);
   font-weight: bold;
-  /* 20px bold clears WCAG's large-text threshold of 18.66px bold, which is
-     what lets this carry the brand orange unaltered at 3.12:1. */
-  font-size  : 1.25rem;
-}
-.org a {
-  color: var(--ionq);
 }
 
 /* h2 and h3 previously fell through to the browser default, which put a serif
