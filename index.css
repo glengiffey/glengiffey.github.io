@@ -14,12 +14,12 @@
   --muted       : #5b6472;
   --accent      : #2f5fd0;
   --accent-soft : rgba(47, 95, 208, .09);
-  /* IonQ's brand orange, taken from the SVG fill on ionq.com. The real value,
-     #ff5000, reaches only 3.12:1 here, and inline in the title line this run
-     is no longer large enough to fall under the 3:1 large-text threshold, so
-     light mode keeps the brand hue and saturation at 40% lightness, which
-     clears 4.64:1. Dark mode uses the brand value itself: 5.68:1 at any size. */
-  --ionq        : #cc4000;
+  /* IonQ's brand orange, taken from the SVG fill on ionq.com, used unaltered
+     in both themes. It cannot pass the 4.5:1 normal-text rule on any light
+     background: against pure white it tops out at 3.28:1, so no amount of
+     tuning the page colour would have helped. Large text needs 3:1, which it
+     clears at 3.12:1, so .org is sized to qualify instead. */
+  --ionq        : #ff5000;
   --border      : #dde2ea;
   /* Graph-paper rule. Low enough to read as texture rather than as content:
      it should be findable if you look for it and invisible if you do not. */
@@ -40,7 +40,6 @@
     --muted       : #939cab;
     --accent      : #7aa2f7;
     --accent-soft : rgba(122, 162, 247, .12);
-    --ionq        : #ff5000;
     --border      : #272d37;
     --grid        : rgba(228, 231, 236, .04);
   }
@@ -112,16 +111,23 @@ h1 {
   line-height  : 1.2;
   margin       : 1rem 0 0.25rem;
 }
+/* Three steps down from the name: the role carries full weight of colour,
+   the team and employer sit back a level. */
 .role {
-  margin : 0;
-  color  : var(--muted);
+  margin: 0;
 }
-/* Sits inline at the end of the title line now. That costs the large-text
-   exemption the standalone version had, so the light theme goes back to a
-   darkened brand hue; see the --ionq token above. */
+.team {
+  margin: 0.1rem 0 0;
+  color : var(--muted);
+}
+/* Closes the title line. 19.2px bold clears WCAG's large-text threshold of
+   18.66px bold, which is the only thing that lets the brand orange be used
+   unaltered here: at the surrounding 15px it would need 4.5:1, and no light
+   background can give it that. */
 .org {
   color      : var(--ionq);
   font-weight: bold;
+  font-size  : 1.2rem;
 }
 
 /* h2 and h3 previously fell through to the browser default, which put a serif
