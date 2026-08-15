@@ -352,11 +352,27 @@ pre {
 
 /* The teapot demo labels its control groups. They used to be h4 elements
    wrapping the very buttons they label, which made a screen reader announce a
-   whole control group as a heading. They are labels, so they are paragraphs
-   now, styled as they always looked. */
+   whole control group as a heading. Turning them into paragraphs fixed that
+   but left the label tied to its buttons only by proximity, so the button
+   groups are now role="group" named by their label. The slider rows stay
+   paragraphs: every slider already has its own <label for>. */
 .control-row {
   font-weight: bold;
   margin     : 1.1rem 0 0.4rem;
+}
+.control-label {
+  margin-right: 0.35rem;
+}
+
+/* Nothing here declared a focus style, so keyboard users had only the browser
+   default ring, which all but disappears against the dark background. This is
+   the only way through 38 buttons and 9 sliders without a mouse.
+   :focus-visible rather than :focus so a mouse click leaves no ring behind.
+   No border-radius here: the outline follows whatever radius the element
+   already has. */
+:focus-visible {
+  outline       : 2px solid var(--accent);
+  outline-offset: 2px;
 }
 .backlink {
   font-size: 0.8125rem;

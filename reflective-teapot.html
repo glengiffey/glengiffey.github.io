@@ -313,18 +313,22 @@ void main(void) {
     </p>
     </div>
 
-    <p class="control-row"> Texture:  </p>
+    <div class="control-row" role="group" aria-labelledby="lbl-texture">
+    <span class="control-label" id="lbl-texture">Texture:</span>
     <button  onclick="texture(0)"> Flat </button>
     <button  onclick="texture(1)"> Regular </button>
     <button  onclick="texture(2)"> Cubemap </button>
+    </div>
 
-    <p class="control-row"> Selection (Select which object to control):
+    <div class="control-row" role="group" aria-labelledby="lbl-selection">
+    <span class="control-label" id="lbl-selection">Selection (Select which object to control):</span>
     <button onclick="Control(1)"> Environment </button>
     <button onclick="Control(2)"> Object </button>
     <button onclick="Control(4)"> Roll Camera </button>
-    </p>
+    </div>
 
-    <p class="control-row"> Camera:
+    <div class="control-row" role="group" aria-labelledby="lbl-camera">
+    <span class="control-label" id="lbl-camera">Camera:</span>
     <button onclick="CameraPosition(1)"> Up </button>
     <button onclick="CameraPosition(2)"> Down </button>
     <button onclick="CameraPosition(3)"> Left </button>
@@ -332,7 +336,7 @@ void main(void) {
     <button onclick="CameraPosition(5)"> Forward </button>
     <button onclick="CameraPosition(6)"> Backward </button>
     <button onclick="ResetCamera()"> Reset </button>
-    </p>
+    </div>
     <p class="control-row">
     <span class="slider-field"><label for="ambient-r">Ambient Intensity (R)</label> <input id="ambient-r" type="range" min="0" max="100" value="12" step="1" onchange="AmbientIntensity(this.value, -1, -1)" /></span>
     <span class="slider-field"><label for="ambient-g">Ambient Intensity (G)</label> <input id="ambient-g" type="range" min="0" max="100" value="12" step="1" onchange="AmbientIntensity(-1, this.value, -1)" /></span>
@@ -349,7 +353,8 @@ void main(void) {
     <span class="slider-field"><label for="specular-b">Specular Intensity (B)</label> <input id="specular-b" type="range" min="0" max="100" value="55" step="1" onchange="SpecularIntensity( -1, -1, this.value)" /></span>
     </p>
     
-    <p class="control-row"> Light:
+    <div class="control-row" role="group" aria-labelledby="lbl-light">
+    <span class="control-label" id="lbl-light">Light:</span>
     <button onclick="LightPosition(1)"> Up </button>
     <button onclick="LightPosition(2)"> Down </button>
     <button onclick="LightPosition(3)"> Left </button>
@@ -357,9 +362,10 @@ void main(void) {
     <button onclick="LightPosition(5)"> Forward </button>
     <button onclick="LightPosition(6)"> Backward </button>
     <button onclick="ResetLight()"> Reset </button>
-    </p>
+    </div>
     
-    <p class="control-row"> Center Of Interest:
+    <div class="control-row" role="group" aria-labelledby="lbl-center-of-interest">
+    <span class="control-label" id="lbl-center-of-interest">Center Of Interest:</span>
     <button onclick="CenterOfInterest(1)"> Up </button>
     <button onclick="CenterOfInterest(2)"> Down </button>
     <button onclick="CenterOfInterest(3)"> Left </button>
@@ -367,9 +373,10 @@ void main(void) {
     <button onclick="CenterOfInterest(5)"> Forward </button>
     <button onclick="CenterOfInterest(6)"> Backward </button>
     <button onclick="ResetCenterOfInterest()"> Reset </button>
-    </p>
+    </div>
 
-    <p class="control-row"> Background:
+    <div class="control-row" role="group" aria-labelledby="lbl-background">
+    <span class="control-label" id="lbl-background">Background:</span>
     <button  onclick="BGSkybox()"> Skybox </button>
     <button  onclick="BG(1,0,0)"> Red </button>
     <button  onclick="BG(0,1,0)"> Green </button>
@@ -377,13 +384,14 @@ void main(void) {
     <button  onclick="BG(0.5,0.5,0.5)"> Grey </button>
     <button  onclick="BG(0,0,0)"> Black </button>
     <button  onclick="BG(1,1,1)"> White </button>
-    </p>
+    </div>
 
-    <p class="control-row"> Geometry:  
+    <div class="control-row" role="group" aria-labelledby="lbl-geometry">
+    <span class="control-label" id="lbl-geometry">Geometry:</span>
     <button  onclick="geometry(0)"> Points </button>
     <button  onclick="geometry(1)"> Lines </button>
     <button  onclick="geometry(2)"> Faces </button>
-    </p>
+    </div>
     
     <button onclick="redraw()"> Reset Scene </button>
 
