@@ -15,6 +15,10 @@
   --muted       : #5b6472;
   --accent      : #2f5fd0;
   --accent-soft : rgba(47, 95, 208, .09);
+  /* IonQ brand orange. The real value, #ff5000, only clears 3.12:1 on this
+     background, so light mode uses the same hue and saturation dropped to 38%
+     lightness, which clears 5.04:1. Dark mode gets the brand value itself. */
+  --ionq        : #c23d00;
   --border      : #dde2ea;
   --shadow      : rgba(0, 0, 0, .22);
   /* Graph-paper rule. Low enough to read as texture rather than as content:
@@ -37,6 +41,7 @@
     --muted       : #939cab;
     --accent      : #7aa2f7;
     --accent-soft : rgba(122, 162, 247, .12);
+    --ionq        : #ff5000;
     --border      : #272d37;
     /* Carries more alpha than the light theme: a shadow this dark reads as a
        shallower step against a dark surface, so it needs the extra weight to
@@ -112,30 +117,16 @@ h1 {
   line-height  : 1.2;
   margin       : 1rem 0 0.25rem;
 }
-/* A terminal caret after the name. Decorative only, so it is hidden from
-   assistive tech, and it holds still for anyone who asks for less motion. */
-.caret {
-  display        : inline-block;
-  width          : 0.5em;
-  height         : 1.05em;
-  margin-left    : 0.15em;
-  vertical-align : -0.15em;
-  background     : var(--accent);
-  animation      : caret-blink 1.15s step-end infinite;
-}
-@keyframes caret-blink { 50% { opacity: 0; } }
-@media (prefers-reduced-motion: reduce) {
-  .caret { animation: none; }
-}
-
 .role {
   margin : 0;
   color  : var(--muted);
 }
 .org {
   margin     : 0.15rem 0 0;
-  color      : var(--accent);
   font-weight: bold;
+}
+.org a {
+  color: var(--ionq);
 }
 
 /* h2 and h3 previously fell through to the browser default, which put a serif
