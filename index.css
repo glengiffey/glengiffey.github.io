@@ -63,3 +63,36 @@ pre {
     radial-gradient(farthest-side at   0 50%, rgba(0, 0, 0, .25), rgba(0, 0, 0, 0)) left  / 14px 100% no-repeat scroll,
     radial-gradient(farthest-side at 100% 50%, rgba(0, 0, 0, .25), rgba(0, 0, 0, 0)) right / 14px 100% no-repeat scroll;
 }
+
+/* projects.html carries far longer prose than the landing page, so the bold
+   p.intro treatment would be heavy spread across a whole page. Same monospace
+   family, normal weight, more line height. font-weight is deliberately absent
+   here so the two p.intro leads on that page keep their bold. */
+.projects p {
+  font-family: monospace;
+  font-size  : 14px;
+  line-height: 1.5;
+}
+.projects h4 {
+  font-family  : monospace;
+  font-size    : 15px;
+  margin-bottom: 0.25rem;
+}
+/* The description belongs to the heading above it, so close that gap. */
+.projects h4 + p {
+  margin-top: 0;
+}
+.projects .backlink {
+  font-size: 13px;
+}
+/* Figures scale down rather than pushing the page wider than the viewport.
+   Both link through to the full-resolution file, which is where the detail
+   actually is. .wide marks a figure that is illegible at the narrower cap. */
+.projects img.figure {
+  width    : 100%;
+  height   : auto;
+  max-width: 560px;
+}
+.projects img.figure.wide {
+  max-width: 100%;
+}
