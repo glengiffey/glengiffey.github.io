@@ -15,12 +15,11 @@
   --muted       : #5b6472;
   --accent      : #2f5fd0;
   --accent-soft : rgba(47, 95, 208, .09);
-  /* IonQ brand orange. The real value, #ff5000, only clears 3.12:1 here, short
-     of the 4.5:1 this text size needs, so light mode keeps the brand hue and
-     saturation and drops lightness to 40%. That is the lightest step that
-     still clears AA against the page background it actually sits on, at
-     4.64:1. Dark mode gets the brand value itself. */
-  --ionq        : #cc4000;
+  /* IonQ's own brand orange, taken from the SVG fill on ionq.com. It reaches
+     3.12:1 on this background, short of the 4.5:1 that normal-size text
+     needs but clear of the 3:1 that large text needs, so .org below is set
+     at a size that qualifies. Same value in both themes. */
+  --ionq        : #ff5000;
   --border      : #dde2ea;
   --shadow      : rgba(0, 0, 0, .22);
   /* Graph-paper rule. Low enough to read as texture rather than as content:
@@ -43,7 +42,6 @@
     --muted       : #939cab;
     --accent      : #7aa2f7;
     --accent-soft : rgba(122, 162, 247, .12);
-    --ionq        : #ff5000;
     --border      : #272d37;
     /* Carries more alpha than the light theme: a shadow this dark reads as a
        shallower step against a dark surface, so it needs the extra weight to
@@ -124,8 +122,11 @@ h1 {
   color  : var(--muted);
 }
 .org {
-  margin     : 0.15rem 0 0;
+  margin     : 0.35rem 0 0;
   font-weight: bold;
+  /* 20px bold clears WCAG's large-text threshold of 18.66px bold, which is
+     what lets this carry the brand orange unaltered at 3.12:1. */
+  font-size  : 1.25rem;
 }
 .org a {
   color: var(--ionq);
