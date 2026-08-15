@@ -308,13 +308,55 @@ pre {
   font-size  : 0.9rem;
   line-height: 1.7;
 }
-.projects h4 {
+/* projects.html has a real page title, so it runs one level deeper than the
+   landing page: title h1, sections h2, projects h3. The visual hierarchy is
+   unchanged, only the tags moved, so each level is re-pointed at the treatment
+   it already had rather than the one its tag would inherit. */
+.projects h1 {
+  font-size     : 1.35rem;
+  padding-bottom: 0.4rem;
+  border-bottom : 1px solid var(--border);
+}
+.projects h2 {
+  font-size     : 1.05rem;
+  margin-top    : 2.25rem;
+  padding-left  : 1.1rem;
+  padding-bottom: 0;
+  border-bottom : 0;
+  position      : relative;
+}
+.projects h2::before {
+  content      : "";
+  position     : absolute;
+  left         : 0;
+  top          : 0.15em;
+  bottom       : 0.15em;
+  width        : 3px;
+  border-radius: 2px;
+  background   : var(--accent);
+}
+.projects h3 {
   font-size    : 0.95rem;
+  margin-top   : 1.75rem;
   margin-bottom: 0.25rem;
+  padding-left : 0;
+}
+/* The section bar belongs to h2 here, so cancel the one h3 inherits. */
+.projects h3::before {
+  content: none;
 }
 /* The description belongs to the heading above it, so close that gap. */
-.projects h4 + p {
+.projects h3 + p {
   margin-top: 0;
+}
+
+/* The teapot demo labels its control groups. They used to be h4 elements
+   wrapping the very buttons they label, which made a screen reader announce a
+   whole control group as a heading. They are labels, so they are paragraphs
+   now, styled as they always looked. */
+.control-row {
+  font-weight: bold;
+  margin     : 1.1rem 0 0.4rem;
 }
 .backlink {
   font-size: 0.8125rem;

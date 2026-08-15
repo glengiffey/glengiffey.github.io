@@ -5,7 +5,18 @@
 
 <head>
 <title>Glen Giffey &mdash; Reflective Teapot</title>
-<link rel="icon" href="data:,">
+<meta name="description" content="An interactive WebGL demo: a brass teapot reflecting a cube-mapped environment, with live controls for lighting, camera, geometry and background.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Glen Giffey">
+<meta property="og:url" content="https://glengiffey.github.io/reflective-teapot.html">
+<meta property="og:title" content="Reflective Teapot &mdash; Glen Giffey">
+<meta property="og:description" content="An interactive WebGL demo: a brass teapot reflecting a cube-mapped environment, with live controls for lighting, camera, geometry and background.">
+<meta property="og:image" content="https://glengiffey.github.io/image/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Glen Giffey, Staff Software Engineer at IonQ">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
 <meta http-equiv="content-type" content="text/html; charset=UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" type="text/css" href="index.css">
@@ -283,26 +294,27 @@ void main(void) {
 
 <body onload="webGLStart();">
     <p class="backlink"><a href="index.html">&larr; Glen Giffey</a></p>
+    <h1>Reflective Teapot</h1>
     <canvas id="code03-canvas" style="border: none;" width="700" height="700"></canvas>
     
     <div>
-    <h4>
+    <p class="control-row">
     Drag on the image to rotate, with the mouse or a finger
-    </h4>
+    </p>
     </div>
 
-    <h4> Texture:  </h4>
+    <p class="control-row"> Texture:  </p>
     <button  onclick="texture(0)"> Flat </button>
     <button  onclick="texture(1)"> Regular </button>
     <button  onclick="texture(2)"> Cubemap </button>
 
-    <h4> Selection (Select which object to control):
+    <p class="control-row"> Selection (Select which object to control):
     <button onclick="Control(1)"> Environment </button>
     <button onclick="Control(2)"> Object </button>
     <button onclick="Control(4)"> Roll Camera </button>
-    </h4>
+    </p>
 
-    <h4> Camera:
+    <p class="control-row"> Camera:
     <button onclick="CameraPosition(1)"> Up </button>
     <button onclick="CameraPosition(2)"> Down </button>
     <button onclick="CameraPosition(3)"> Left </button>
@@ -310,24 +322,24 @@ void main(void) {
     <button onclick="CameraPosition(5)"> Forward </button>
     <button onclick="CameraPosition(6)"> Backward </button>
     <button onclick="ResetCamera()"> Reset </button>
-    </h4>
-    <h4>
+    </p>
+    <p class="control-row">
     <span class="slider-field"><label for="ambient-r">Ambient Intensity (R)</label> <input id="ambient-r" type="range" min="0" max="100" value="12" step="1" onchange="AmbientIntensity(this.value, -1, -1)" /></span>
     <span class="slider-field"><label for="ambient-g">Ambient Intensity (G)</label> <input id="ambient-g" type="range" min="0" max="100" value="12" step="1" onchange="AmbientIntensity(-1, this.value, -1)" /></span>
     <span class="slider-field"><label for="ambient-b">Ambient Intensity (B)</label> <input id="ambient-b" type="range" min="0" max="100" value="12" step="1" onchange="AmbientIntensity(-1, -1, this.value)" /></span>
-    </h4>
-    <h4>
+    </p>
+    <p class="control-row">
     <span class="slider-field"><label for="diffuse-r">Diffuse Intensity (R)</label> <input id="diffuse-r" type="range" min="0" max="100" value="58" step="1" onchange="DiffuseIntensity(this.value, -1, -1)" /></span>
     <span class="slider-field"><label for="diffuse-g">Diffuse Intensity (G)</label> <input id="diffuse-g" type="range" min="0" max="100" value="58" step="1" onchange="DiffuseIntensity(-1, this.value, -1)" /></span>
     <span class="slider-field"><label for="diffuse-b">Diffuse Intensity (B)</label> <input id="diffuse-b" type="range" min="0" max="100" value="58" step="1" onchange="DiffuseIntensity(-1, -1, this.value)" /></span>
-    </h4>
-    <h4>
+    </p>
+    <p class="control-row">
     <span class="slider-field"><label for="specular-r">Specular Intensity (R)</label> <input id="specular-r" type="range" min="0" max="100" value="55" step="1" onchange="SpecularIntensity(this.value, -1, -1)" /></span>
     <span class="slider-field"><label for="specular-g">Specular Intensity (G)</label> <input id="specular-g" type="range" min="0" max="100" value="55" step="1" onchange="SpecularIntensity( -1, this.value, -1)" /></span>
     <span class="slider-field"><label for="specular-b">Specular Intensity (B)</label> <input id="specular-b" type="range" min="0" max="100" value="55" step="1" onchange="SpecularIntensity( -1, -1, this.value)" /></span>
-    </h4>
+    </p>
     
-    <h4> Light:
+    <p class="control-row"> Light:
     <button onclick="LightPosition(1)"> Up </button>
     <button onclick="LightPosition(2)"> Down </button>
     <button onclick="LightPosition(3)"> Left </button>
@@ -335,9 +347,9 @@ void main(void) {
     <button onclick="LightPosition(5)"> Forward </button>
     <button onclick="LightPosition(6)"> Backward </button>
     <button onclick="ResetLight()"> Reset </button>
-    </h4>
+    </p>
     
-    <h4> Center Of Interest:
+    <p class="control-row"> Center Of Interest:
     <button onclick="CenterOfInterest(1)"> Up </button>
     <button onclick="CenterOfInterest(2)"> Down </button>
     <button onclick="CenterOfInterest(3)"> Left </button>
@@ -345,9 +357,9 @@ void main(void) {
     <button onclick="CenterOfInterest(5)"> Forward </button>
     <button onclick="CenterOfInterest(6)"> Backward </button>
     <button onclick="ResetCenterOfInterest()"> Reset </button>
-    </h4>
+    </p>
 
-    <h4> Background:
+    <p class="control-row"> Background:
     <button  onclick="BGSkybox()"> Skybox </button>
     <button  onclick="BG(1,0,0)"> Red </button>
     <button  onclick="BG(0,1,0)"> Green </button>
@@ -355,13 +367,13 @@ void main(void) {
     <button  onclick="BG(0.5,0.5,0.5)"> Grey </button>
     <button  onclick="BG(0,0,0)"> Black </button>
     <button  onclick="BG(1,1,1)"> White </button>
-    </h4>
+    </p>
 
-    <h4> Geometry:  
+    <p class="control-row"> Geometry:  
     <button  onclick="geometry(0)"> Points </button>
     <button  onclick="geometry(1)"> Lines </button>
     <button  onclick="geometry(2)"> Faces </button>
-    </h4>
+    </p>
     
     <button onclick="redraw()"> Reset Scene </button>
 
