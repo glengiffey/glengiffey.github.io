@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="index.css">
+    <title>Machine Learning Implementations &mdash; Glen Giffey</title>
+    <meta name="description" content="Eleven machine learning algorithms implemented from scratch during an M.S. in Computer Science: backpropagation, associative memory, RBF and convolutional networks, naive Bayes with feature selection, fuzzy inference and Gale-Shapley matching.">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Glen Giffey">
+    <meta property="og:url" content="https://glengiffey.github.io/projects.html">
+    <meta property="og:title" content="Machine Learning Implementations &mdash; Glen Giffey">
+    <meta property="og:description" content="Eleven machine learning algorithms implemented from scratch during an M.S. in Computer Science: backpropagation, associative memory, RBF and convolutional networks, naive Bayes with feature selection, fuzzy inference and Gale-Shapley matching.">
+    <meta property="og:image" content="https://glengiffey.github.io/image/og.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Glen Giffey, Staff Software Engineer at IonQ">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  </head>
+
+<body>
+  <div class="layout">
+    <div class="content projects">
+      <p class="backlink"><a href="index.html">&larr; Glen Giffey</a></p>
+
+      <h1>Machine Learning Implementations</h1>
+
+      <p class="intro">Algorithms built from the definition rather than called
+      from a library, mostly written during my M.S. in Computer Science at
+      Wright State University. In each one the interesting part is the method
+      itself: the training loop, the update rule, the selection criterion.</p>
+
+      <p class="intro">Source for all of these is in the
+      <a href="https://github.com/glengiffey/code-vault">code-vault</a>
+      repository, one directory per project, each with its own write-up.</p>
+
+      <h2>Neural Networks</h2>
+
+      <h3>Backpropagation Regressor</h3>
+      <p>A two-hidden-layer network with momentum, trained to fit
+      <code>f(x) = 1/x</code> and then deliberately tested outside its training
+      range. Inside the range it fits closely; past it the prediction degrades,
+      because the network has no mechanism for extrapolation and its behaviour
+      out there is set by the shape of the saturated hidden units rather than by
+      anything about the target function. The forward and backward passes are
+      written out, and evaluation is k-fold with MSE, RMSE and R-squared.</p>
+
+      <h3>Associative Memory</h3>
+      <p>A linear associative memory storing 38 letter images as bipolar
+      vectors, with the memory matrix built in one shot from the pseudo-inverse
+      rather than trained iteratively. Recall is a matrix product and a sign
+      activation. Three conditions: clean recall, recall from corrupted input,
+      and the harder case of building the memory from corrupted images in the
+      first place, where the stored attractors themselves degrade.</p>
+
+      <h3>Radial Basis Function Network</h3>
+      <p>Both stages implemented: a k-means pass places the basis centres and
+      derives each width from the spread of its assigned points, then the output
+      layer is a linear fit over the resulting activations. Because that second
+      stage is linear once the centres are fixed, there is no backpropagation in
+      it at all, which is the appeal of the architecture.</p>
+
+      <h3>Convolutional Network on Fashion-MNIST</h3>
+      <p>Convolution into pooling into dense classification, with dropout,
+      evaluated by 5-fold cross-validation. Reported with per-class precision,
+      recall and F1 rather than accuracy alone, because Fashion-MNIST has
+      classes that are genuinely hard to separate and an aggregate accuracy
+      figure hides exactly that.</p>
+      <p><a href="image/cnn-network-diagram.png"><img class="figure"
+      src="image/cnn-network-diagram.png"
+      alt="Network architecture: a 28x28x1 input through convolution to 28x28x32, pooling to 14x14x32, dropout 0.15, a second convolution to 14x14x64, pooling to 7x7x64, dropout 0.05, then flatten 3136x150 into a 150x10 dense layer and a softmax output"></a></p>
+
+      <h2>Classification</h2>
+
+      <h3>Naive Bayes with Sequential Forward Selection</h3>
+      <p>The largest implementation here. A categorical Naive Bayes classifier
+      that builds its likelihood tables from the training split, wrapped in a
+      greedy forward selection that re-trains the full classifier for every
+      candidate feature. Because it scores features against the model that will
+      actually use them rather than against a proxy statistic, the trace of what
+      it selected and in what order is the useful output.</p>
+
+      <h3>Logistic Regression</h3>
+      <p>Gradient descent and L2 regularisation written out, with metrics
+      derived from a hand-counted confusion matrix, and its own forward
+      selection scored on F1. The F1 choice is the point: the outcome is
+      imbalanced at roughly 20% positive, so accuracy would reward a model that
+      predicts the majority class and never fires. Runs against ten fresh random
+      splits so the selected feature set can be compared across runs.</p>
+
+      <h3>Gaussian Classifier</h3>
+      <p>Two Gaussian classes separated by a single sigmoid unit trained on
+      cross-entropy loss, with both derivatives derived by hand. The weight
+      update chains them together, which is the same computation
+      backpropagation performs at one node. The panels below track training
+      across 25 epochs, with the error falling from 0.054 to effectively zero as
+      the decision boundary settles between the two classes.</p>
+      <p><a href="image/gaussian-classifier-training.png"><img class="figure wide"
+      src="image/gaussian-classifier-training.png"
+      alt="Six panels showing training at epochs 0, 5, 10, 15, 20 and 25. The two classes sit near x = -10 and x = +10, the fitted sigmoid transitions between them, and the reported error falls from 0.054 to 0.000"></a></p>
+
+      <h3>Perceptron</h3>
+      <p>Single-layer perceptrons for AND, OR and complement, with weights
+      derived by hand rather than learned. No training loop. The point is that
+      these are derivable and XOR is not, which is the motivation for the
+      multi-layer work above.</p>
+
+      <h2>Clustering and Other Algorithms</h2>
+
+      <h3>k-means and Fuzzy c-means</h3>
+      <p>Hard and soft clustering, both from scratch. Fuzzy c-means replaces
+      hard assignment with a membership weight per point per cluster, so a point
+      between two clusters pulls on both. Both sweep k from 2 to 10 and score
+      each result with a Dunn index written from the definition, which is also
+      the slowest part of the run.</p>
+
+      <h3>Fuzzy Inference System</h3>
+      <p>The textbook worked example for fuzzy inference has two inputs. This
+      extends it to five, mapping four restaurant rating dimensions and a price
+      tier onto a single personalised review score through triangular membership
+      functions, a rule base and defuzzification. Combining five inputs is what
+      makes the rule base the real work. Weighting the dimensions differently
+      gives a different score for the same restaurant, which is the reason to
+      use fuzzy logic instead of a weighted average.</p>
+
+      <h3>Gale-Shapley Stable Matching</h3>
+      <p>Proposal and deferred acceptance for the stable marriage problem, with
+      an independent verifier that searches for any pair who would both rather
+      have each other than their assigned partner. The algorithm is proven to
+      produce stable matchings, so that check tests the implementation rather
+      than the theory. Includes a scaling study out to n = 1000, consistent with
+      the O(n&sup2;) bound.</p>
+
+      <h2>Notes</h2>
+      <p>Two of these projects started from a published tutorial and were
+      extended rather than written from scratch. Both say so at the top of their
+      write-up, and the repository records the origin of every file.</p>
+
+      <p>Some of the original inputs were coursework data that is not mine to
+      redistribute, most clearly a survey of individual human respondents. Those
+      are not published. The repository generates schema-compatible synthetic
+      substitutes instead, so the code still runs, with the caveat that figures
+      reproduced from it will not match my original results.</p>
+
+      <p class="backlink"><a href="index.html">&larr; Glen Giffey</a></p>
+    </div>
+  </div>
+</body>
+</html>

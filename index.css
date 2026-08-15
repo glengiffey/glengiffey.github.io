@@ -1,36 +1,104 @@
-body {
-  margin: 1rem;
+/* Tokens. Every colour on the site resolves through one of these, so the dark
+   block below only has to redeclare values, never rules. Off-white and
+   near-black rather than #fff and #000: at full-page scale the pure values are
+   harsh, and the near-black keeps a little blue in it to sit with the photo. */
+:root {
+  color-scheme: light dark;
+
+  --bg          : #f8f9fb;
+  --surface     : #eef1f6;
+  /* Same colour at zero alpha. The fade gradients below interpolate to this
+     rather than to `transparent`, which some engines resolve as transparent
+     black and fringe grey. The original stylesheet took the same care. */
+  --fg          : #1a1d23;
+  --muted       : #5b6472;
+  --accent      : #2f5fd0;
+  --accent-soft : rgba(47, 95, 208, .09);
+  /* IonQ's brand orange, taken from the SVG fill on ionq.com, used unaltered
+     in both themes. It cannot pass the 4.5:1 normal-text rule on any light
+     background: against pure white it tops out at 3.28:1, so no amount of
+     tuning the page colour would have helped. Large text needs 3:1, which it
+     clears at 3.12:1, so .org is sized to qualify instead. */
+  --ionq        : #ff5000;
+  --border      : #dde2ea;
+  /* Graph-paper rule. Low enough to read as texture rather than as content:
+     it should be findable if you look for it and invisible if you do not. */
+  --grid        : rgba(26, 29, 35, .045);
+
+  /* Bare `monospace` resolves to Courier on some systems and Consolas or
+     DejaVu on others, with metrics different enough to break the column
+     measurements the comments below depend on. Pin the stack. */
+  --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
+          "Liberation Mono", monospace;
 }
 
-/* Stacked by default. The photo caps at 400px but scales down rather than
-   pushing the page wider than the viewport. */
-.profile img {
-  width     : 100%;
-  max-width : 400px;
-  height    : auto;
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg          : #101317;
+    --surface     : #191d24;
+    --fg          : #e4e7ec;
+    --muted       : #939cab;
+    --accent      : #7aa2f7;
+    --accent-soft : rgba(122, 162, 247, .12);
+    --border      : #272d37;
+    --grid        : rgba(228, 231, 236, .04);
+  }
 }
-/* Cap the measure so the prose stays readable on a wide monitor. Wide enough
-   that the <pre> blocks below, the widest of which is about 564px, still fit
-   without scrolling. */
+
+body {
+  margin     : 0;
+  padding    : 2.5rem 1.25rem;
+  color      : var(--fg);
+  font-family: var(--mono);
+  font-size  : 0.9375rem;
+  line-height: 1.65;
+  background-color: var(--bg);
+  /* Fixed so the grid stays put while the page scrolls, which reads as paper
+     behind the content rather than as a pattern glued to it. */
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size    : 34px 34px;
+  background-attachment: fixed;
+}
+
+/* Cap and centre the whole thing: 400px photo + 2rem gap + the 46rem text
+   column is 73rem, so past that the layout would drift left of centre on a
+   wide monitor rather than growing. */
+.layout {
+  max-width: 73rem;
+  margin   : 0 auto;
+}
+
+.profile img {
+  width        : 100%;
+  max-width    : 400px;
+  height       : auto;
+  border       : 1px solid var(--border);
+  border-radius: 8px;
+  display      : block;
+}
+/* Cap the measure so the prose stays readable on a wide monitor. */
 .content {
   max-width: 46rem;
 }
 
-/* Two columns only once the text column still clears the widest <pre>, which
-   measures about 564px, beside the 400px photo and the 2rem gap. Letting
-   flex-wrap pick the breakpoint instead gave the photo its full width first
-   and collapsed the text to 336px between 800 and 1039px, clipping content at
-   widths where a single column had rendered it in full. */
 @media (min-width: 1100px) {
   .layout {
     display    : flex;
     gap        : 2rem;
     align-items: flex-start;
   }
+  /* Sticky rather than static: the column is much shorter than the article
+     beside it, so left alone it leaves a screen of dead space at the bottom
+     of every scroll. Following the reader keeps the name and links reachable
+     instead. */
   .profile {
-    flex: 0 0 400px;
+    flex    : 0 0 400px;
+    position: sticky;
+    top     : 2.5rem;
   }
-  /* min-width:0 lets the <pre> blocks shrink inside the flex item instead of
+  /* min-width:0 lets wide children shrink inside the flex item instead of
      forcing the whole page wider than the viewport. */
   .content {
     flex     : 1 1 auto;
@@ -38,28 +106,323 @@ body {
   }
 }
 
+h1 {
+  font-size    : 1.5rem;
+  line-height  : 1.2;
+  margin       : 1rem 0 0.25rem;
+}
+/* Three steps down from the name: the role carries full weight of colour,
+   the team and employer sit back a level. */
+.role {
+  margin: 0;
+}
+.team {
+  margin: 0.1rem 0 0;
+  color : var(--muted);
+}
+/* Closes the title line. 19.2px bold clears WCAG's large-text threshold of
+   18.66px bold, which is the only thing that lets the brand orange be used
+   unaltered here: at the surrounding 15px it would need 4.5:1, and no light
+   background can give it that. */
+.org {
+  color      : var(--ionq);
+  font-weight: bold;
+  font-size  : 1.2rem;
+}
+
+/* h2 and h3 previously fell through to the browser default, which put a serif
+   heading on an otherwise monospace page. */
 h2 {
-	font-family : monospace;
-	font-weight : bold;
-	font-size   : 20px;
+  font-size     : 1.35rem;
+  padding-bottom: 0.4rem;
+  border-bottom : 1px solid var(--border);
 }
+h3 {
+  font-size   : 1.05rem;
+  margin-top  : 2.25rem;
+  padding-left: 1.1rem;
+  position    : relative;
+}
+/* A bar in the accent rather than a colour change on the whole heading: it
+   marks the section start down the left edge, so the eye can find the
+   sections while scanning without the headings shouting. */
+h3::before {
+  content : "";
+  position: absolute;
+  left    : 0;
+  top     : 0.15em;
+  bottom  : 0.15em;
+  width   : 3px;
+  border-radius: 2px;
+  background   : var(--accent);
+}
+
+a {
+  color                    : var(--accent);
+  text-underline-offset    : 0.2em;
+  text-decoration-thickness: 1px;
+}
+a:hover {
+  text-decoration-thickness: 2px;
+}
+
 p.intro {
-	font-family : monospace;
-	font-weight : bold;
-	font-size   : 14px;
+  font-size: 0.9375rem;
 }
-/* These keep their column alignment, so scroll them rather than wrap them.
-   A shadow marks whichever edge still has content behind it, and clears once
-   you reach that end. The platform scrollbar cannot do this job: it is an
-   overlay that paints nothing until you are already scrolling, so clipped
-   content reads as missing content. The gradients pinned "local" scroll with
-   the text and uncover the "scroll" shadows underneath only when there is
-   something to reach. */
-pre {
-  overflow-x: auto;
-  background:
-    linear-gradient(to right, #fff 30%, rgba(255, 255, 255, 0)) left   / 40px 100% no-repeat local,
-    linear-gradient(to left,  #fff 30%, rgba(255, 255, 255, 0)) right  / 40px 100% no-repeat local,
-    radial-gradient(farthest-side at   0 50%, rgba(0, 0, 0, .25), rgba(0, 0, 0, 0)) left  / 14px 100% no-repeat scroll,
-    radial-gradient(farthest-side at 100% 50%, rgba(0, 0, 0, .25), rgba(0, 0, 0, 0)) right / 14px 100% no-repeat scroll;
+
+/* Skills read as a set of labels, not as ordered prose, so they get chips.
+   As a <pre> they also forced a horizontal scroll on a phone. */
+.chips {
+  list-style: none;
+  padding   : 0;
+  margin    : 0;
+  display   : flex;
+  flex-wrap : wrap;
+  gap       : 0.45rem;
+}
+.chips li {
+  font-size    : 0.8125rem;
+  padding      : 0.25rem 0.6rem;
+  border       : 1px solid var(--border);
+  border-radius: 999px;
+  background   : var(--accent-soft);
+}
+
+/* Experience and education are two columns of aligned text. As <pre> blocks
+   they held their alignment with hand-counted spaces, which meant they could
+   only hold it at one width and scrolled sideways below it. A flex row keeps
+   the alignment on a wide screen and lets the date wrap under the role on a
+   narrow one. */
+.timeline {
+  list-style: none;
+  padding   : 0;
+  margin    : 0;
+}
+.timeline li {
+  display        : flex;
+  justify-content: space-between;
+  align-items    : baseline;
+  gap            : 0.5rem 1.5rem;
+  flex-wrap      : wrap;
+  padding        : 0.5rem 0;
+  border-bottom  : 1px solid var(--border);
+}
+.timeline li:last-child {
+  border-bottom: 0;
+}
+.timeline .when {
+  color      : var(--muted);
+  font-size  : 0.85rem;
+  white-space: nowrap;
+}
+
+/* The two demos are the reason anyone scrolls this far, so they get a target
+   worth clicking rather than a bare list item. */
+.cards {
+  list-style: none;
+  padding   : 0;
+  margin    : 0;
+  display   : grid;
+  gap       : 0.6rem;
+}
+.cards a {
+  display        : block;
+  padding        : 0.7rem 0.9rem;
+  background     : var(--surface);
+  border         : 1px solid var(--border);
+  border-left    : 3px solid var(--accent);
+  border-radius  : 6px;
+  text-decoration: none;
+  color          : var(--fg);
+}
+.cards a:hover {
+  border-color: var(--accent);
+  background  : var(--accent-soft);
+}
+.cards strong {
+  color: var(--accent);
+}
+.cards span {
+  display  : block;
+  color    : var(--muted);
+  font-size: 0.85rem;
+}
+
+/* Profile links sit in the sidebar, laid out as a row of small targets. */
+.links {
+  list-style: none;
+  padding   : 0;
+  margin    : 1.25rem 0 0;
+  display   : flex;
+  flex-wrap : wrap;
+  gap       : 0.5rem;
+}
+.links a {
+  display        : inline-block;
+  padding        : 0.3rem 0.75rem;
+  border         : 1px solid var(--border);
+  border-radius  : 6px;
+  background     : var(--surface);
+  text-decoration: none;
+  font-size      : 0.85rem;
+}
+.links a:hover {
+  border-color: var(--accent);
+  background  : var(--accent-soft);
+}
+
+
+/* projects.html is a single column with no photo beside it, so centre the
+   measure inside the wider layout cap rather than leaving it pinned left. */
+.projects {
+  margin-inline: auto;
+}
+.projects p {
+  font-size  : 0.9rem;
+  line-height: 1.7;
+}
+/* projects.html has a real page title, so it runs one level deeper than the
+   landing page: title h1, sections h2, projects h3. The visual hierarchy is
+   unchanged, only the tags moved, so each level is re-pointed at the treatment
+   it already had rather than the one its tag would inherit. */
+.projects h1 {
+  font-size     : 1.35rem;
+  padding-bottom: 0.4rem;
+  border-bottom : 1px solid var(--border);
+}
+.projects h2 {
+  font-size     : 1.05rem;
+  margin-top    : 2.25rem;
+  padding-left  : 1.1rem;
+  padding-bottom: 0;
+  border-bottom : 0;
+  position      : relative;
+}
+.projects h2::before {
+  content      : "";
+  position     : absolute;
+  left         : 0;
+  top          : 0.15em;
+  bottom       : 0.15em;
+  width        : 3px;
+  border-radius: 2px;
+  background   : var(--accent);
+}
+.projects h3 {
+  font-size    : 0.95rem;
+  margin-top   : 1.75rem;
+  margin-bottom: 0.25rem;
+  padding-left : 0;
+}
+/* The section bar belongs to h2 here, so cancel the one h3 inherits. */
+.projects h3::before {
+  content: none;
+}
+/* The description belongs to the heading above it, so close that gap. */
+.projects h3 + p {
+  margin-top: 0;
+}
+
+/* The teapot demo labels its control groups. They used to be h4 elements
+   wrapping the very buttons they label, which made a screen reader announce a
+   whole control group as a heading. Turning them into paragraphs fixed that
+   but left the label tied to its buttons only by proximity, so the button
+   groups are now role="group" named by their label. The slider rows stay
+   paragraphs: every slider already has its own <label for>. */
+.control-row {
+  font-weight: bold;
+  margin     : 1.1rem 0 0.4rem;
+}
+.control-label {
+  margin-right: 0.35rem;
+}
+
+/* Nothing here declared a focus style, so keyboard users had only the browser
+   default ring, which all but disappears against the dark background. This is
+   the only way through 38 buttons and 9 sliders without a mouse.
+   :focus-visible rather than :focus so a mouse click leaves no ring behind.
+   No border-radius here: the outline follows whatever radius the element
+   already has. */
+:focus-visible {
+  outline       : 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.backlink {
+  font-size: 0.8125rem;
+}
+/* Figures scale down rather than pushing the page wider than the viewport.
+   Both link through to the full-resolution file, which is where the detail
+   actually is. .wide marks a figure that is illegible at the narrower cap.
+   The plate keeps a white-background diagram from floating unbounded on a
+   tinted page, and stops it glaring in dark mode. */
+.projects img.figure {
+  width        : 100%;
+  height       : auto;
+  max-width    : 560px;
+  border       : 1px solid var(--border);
+  border-radius: 6px;
+  background   : #fff;
+  padding      : 0.5rem;
+  box-sizing   : border-box;
+}
+.projects img.figure.wide {
+  max-width: 100%;
+}
+
+/* This page is a resume, so it will get printed. Everything that only makes
+   sense on a screen comes off: the graph-paper grid, the tinted panels, the
+   sticky column, the navigation. Colours go to black on white whatever theme
+   the reader was viewing, because a dark page prints muddy and drinks ink.
+   Overriding the tokens rather than the rules means every component follows
+   without being named. */
+@media print {
+  :root {
+    --bg         : #fff;
+    --surface    : #fff;
+    --fg         : #000;
+    --muted      : #333;
+    --accent     : #000;
+    --accent-soft: transparent;
+    --border     : #999;
+    --ionq       : #000;
+  }
+  body {
+    padding         : 0;
+    font-size       : 10.5pt;
+    line-height     : 1.45;
+    background-image: none;
+  }
+  .layout  { display: block; max-width: none; }
+  .content { max-width: none; }
+  /* Sticky positioning would pin the column to one printed page. */
+  .profile { position: static; }
+  /* The photo is ink-expensive and a printed resume rarely wants one, and the
+     back link leads nowhere on paper. */
+  .profile img,
+  .backlink { display: none; }
+  /* A printed link is worth nothing unless you can read where it points. */
+  /* The email link already reads as its own address, so it needs no
+     expansion; CSS cannot strip the mailto: prefix anyway. */
+  .content a[href^="http"]::after,
+  .links a[href^="http"]::after {
+    content   : " (" attr(href) ")";
+    font-size : 9pt;
+    word-break: break-all;
+  }
+  /* Chrome that reads as structure on screen is just boxes on paper. */
+  .cards a,
+  .links a,
+  .chips li {
+    background   : none;
+    border       : 0;
+    border-radius: 0;
+    padding      : 0;
+  }
+  .chips    { gap: 0 0.6rem; }
+  .chips li::after            { content: " \00b7"; }
+  .chips li:last-child::after { content: ""; }
+  /* Never split a role from its dates, or strand a heading at a page foot. */
+  h1, h2, h3 { break-after: avoid; page-break-after: avoid; }
+  .timeline li,
+  .cards li  { break-inside: avoid; page-break-inside: avoid; }
 }
