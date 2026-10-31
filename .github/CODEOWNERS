@@ -1,0 +1,3 @@
+# Every path needs Glen's review: the main ruleset requires a code owner's approval,
+# so the VPS machine account's own approvals never count (claude-config ADR 0017).
+* @glengiffey
